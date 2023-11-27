@@ -1,4 +1,4 @@
-package com.jeontongju.product.entity.common;
+package com.jeontongju.product.domain.common;
 
 import java.sql.Timestamp;
 import javax.persistence.Column;

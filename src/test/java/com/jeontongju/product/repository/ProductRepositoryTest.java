@@ -1,6 +1,6 @@
 package com.jeontongju.product.repository;
 
-import com.jeontongju.product.entity.*;
+import com.jeontongju.product.domain.*;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

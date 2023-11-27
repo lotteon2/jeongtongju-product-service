@@ -1,4 +1,4 @@
-package com.jeontongju.product.entity;
+package com.jeontongju.product.domain;
 
 import javax.persistence.*;
 

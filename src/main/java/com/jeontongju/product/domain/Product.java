@@ -1,6 +1,6 @@
-package com.jeontongju.product.entity;
+package com.jeontongju.product.domain;
 
-import com.jeontongju.product.entity.common.BaseEntity;
+import com.jeontongju.product.domain.common.BaseEntity;
 import java.util.UUID;
 import javax.persistence.*;
 import lombok.*;

@@ -1,7 +1,7 @@
 package com.jeontongju.product.repository;
 
-import com.jeontongju.product.entity.Shorts;
-import com.jeontongju.product.entity.ShortsType;
+import com.jeontongju.product.domain.Shorts;
+import com.jeontongju.product.enums.ShortsTypeEnum;
 import java.util.UUID;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -28,11 +28,11 @@ public class ShortsRepositoryTest {
             .thumbnail("/thumbnail/example")
             .title("복순이 복순복순 싸게 팔아요")
             .description("엄청 싸요!!!")
-            .type(ShortsType.PRODUCT)
+            .type(ShortsTypeEnum.PRODUCT)
             .build();
     Shorts shorts = shortsRepository.save(shortsEntity);
     Assertions.assertThat(shorts.getShortsId()).isNotNull();
     Assertions.assertThat(shorts.getProductId()).isSameAs(shortsEntity.getProductId());
-    Assertions.assertThat(shorts.getType()).isSameAs(ShortsType.PRODUCT);
+    Assertions.assertThat(shorts.getType()).isSameAs(ShortsTypeEnum.PRODUCT);
   }
 }

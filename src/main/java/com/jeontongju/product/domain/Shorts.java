@@ -1,9 +1,10 @@
-package com.jeontongju.product.entity;
+package com.jeontongju.product.domain;
 
-import com.jeontongju.product.entity.common.BaseEntity;
+import com.jeontongju.product.domain.common.BaseEntity;
 
 import javax.persistence.*;
 
+import com.jeontongju.product.enums.ShortsTypeEnum;
 import lombok.*;
 
 import java.util.UUID;
@@ -41,7 +42,7 @@ public class Shorts extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    private ShortsType type;
+    private ShortsTypeEnum type;
 
     @Builder.Default
     @Column(name = "hits", nullable = false)
