@@ -15,9 +15,9 @@ import org.hibernate.annotations.GenericGenerator;
 public class Product extends BaseEntity {
 
   @Id
-  @GeneratedValue(generator = "uuid-hibernate-generator")
-  @GenericGenerator(name = "uuid-hibernate-generator", strategy = "org.hibernate.id.UUIDGenerator")
-  @Column(name = "product_id", columnDefinition = "VARCHAR(36)")
+  @GeneratedValue(generator = "uuid2")
+  @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
+  @Column(name = "product_id", columnDefinition = "BINARY(16)")
   private UUID productId;
 
   @JoinColumn(name = "category_id")
@@ -65,13 +65,11 @@ public class Product extends BaseEntity {
 
   @OneToOne(
       mappedBy = "product",
-      fetch = FetchType.LAZY,
       cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
   private ProductThumbnailImage productThumbnailImage;
 
   @OneToOne(
       mappedBy = "product",
-      fetch = FetchType.LAZY,
       cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
   private ProductDetailsImage productDetailsImage;
 
