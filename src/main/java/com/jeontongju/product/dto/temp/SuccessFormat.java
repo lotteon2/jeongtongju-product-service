@@ -12,12 +12,12 @@ import lombok.*;
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class SuccessFormat {
+public class SuccessFormat<T> {
 
   private final Integer code;
   private final String message;
   private final String detail;
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private final Object data;
+  private final T data;
 }
