@@ -1,7 +1,7 @@
 package com.jeontongju.product.controller;
 
 import com.jeontongju.product.dto.response.CategoryDto;
-import com.jeontongju.product.dto.temp.SuccessFormat;
+import com.jeontongju.product.dto.temp.ResponseFormat;
 import com.jeontongju.product.service.ProductService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -19,11 +19,11 @@ public class ProductRestController {
   private final ProductService productService;
 
   @GetMapping("/categories")
-  public ResponseEntity<SuccessFormat<List<CategoryDto>>> getCategoryAll() {
+  public ResponseEntity<ResponseFormat<List<CategoryDto>>> getCategoryAll() {
 
     return ResponseEntity.ok()
         .body(
-            SuccessFormat.<List<CategoryDto>>builder()
+            ResponseFormat.<List<CategoryDto>>builder()
                 .code(HttpStatus.OK.value())
                 .message(HttpStatus.OK.name())
                 .detail("카테고리 종류 조회 성공")

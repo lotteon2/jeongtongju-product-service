@@ -1,7 +1,7 @@
 package com.jeontongju.product.exception.advice;
 
+import com.jeontongju.product.dto.temp.ResponseFormat;
 import com.jeontongju.product.exception.common.DomainException;
-import com.jeontongju.product.dto.temp.ErrorFormat;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -25,11 +25,11 @@ public class ApiControllerAdvice extends ResponseEntityExceptionHandler {
   private static final String DUPLICATE_KEY_EXCEPTION_MESSAGE = "중복 키 오류 ";
 
   @ExceptionHandler(DomainException.class)
-  public ResponseEntity<ErrorFormat> domainException(DomainException e) {
+  public ResponseEntity<ResponseFormat> domainException(DomainException e) {
     log.error("{PRODUCT}", e.getMessage());
     HttpStatus status = e.getStatus();
-    ErrorFormat body =
-        ErrorFormat.builder()
+    ResponseFormat body =
+        ResponseFormat.builder()
             .code(status.value())
             .message(status.name())
             .detail(e.getMessage())
@@ -39,11 +39,11 @@ public class ApiControllerAdvice extends ResponseEntityExceptionHandler {
   }
 
   @ExceptionHandler(DuplicateKeyException.class)
-  public ResponseEntity<ErrorFormat> duplicateKeyException(DuplicateKeyException e) {
+  public ResponseEntity<ResponseFormat> duplicateKeyException(DuplicateKeyException e) {
     log.error("{PRODUCT}", e.getMessage());
     HttpStatus status = HttpStatus.BAD_REQUEST;
-    ErrorFormat body =
-        ErrorFormat.builder()
+    ResponseFormat body =
+        ResponseFormat.builder()
             .code(status.value())
             .message(status.name())
             .detail(DUPLICATE_KEY_EXCEPTION_MESSAGE)
@@ -60,8 +60,8 @@ public class ApiControllerAdvice extends ResponseEntityExceptionHandler {
       WebRequest request) {
 
     log.error("{PRODUCT}", e.getMessage());
-    ErrorFormat body =
-        ErrorFormat.builder()
+    ResponseFormat body =
+        ResponseFormat.builder()
             .code(status.value())
             .message(status.name())
             .detail(
@@ -74,12 +74,12 @@ public class ApiControllerAdvice extends ResponseEntityExceptionHandler {
   }
 
   @ExceptionHandler(DataIntegrityViolationException.class)
-  public ResponseEntity<ErrorFormat> constraintViolationException(
+  public ResponseEntity<ResponseFormat> constraintViolationException(
       DataIntegrityViolationException e) {
     log.error("{PRODUCT}", e.getMessage());
     HttpStatus status = HttpStatus.BAD_REQUEST;
-    ErrorFormat body =
-        ErrorFormat.builder()
+    ResponseFormat body =
+        ResponseFormat.builder()
             .code(status.value())
             .message(status.name())
             .detail(UNIQUE_CONSTRAINT_EXCEPTION_MESSAGE)
@@ -90,12 +90,12 @@ public class ApiControllerAdvice extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(Exception.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  public ResponseEntity<ErrorFormat> exception(Exception e) {
+  public ResponseEntity<ResponseFormat> exception(Exception e) {
     log.error("{PRODUCT}", e.getMessage());
     HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 
-    ErrorFormat body =
-        ErrorFormat.builder()
+    ResponseFormat body =
+        ResponseFormat.builder()
             .code(status.value())
             .message(status.name())
             .detail(e.getMessage())
