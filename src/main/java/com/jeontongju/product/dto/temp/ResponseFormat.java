@@ -5,19 +5,22 @@ import lombok.*;
 
 /**
  domain : all
- detail : Rest 통신시 사용되는 Success Format Dto
+ detail : Rest 통신시 사용되는 Format Dto
  method :
  comment :
  */
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class SuccessFormat {
+public class ResponseFormat<T> {
 
-  private final Integer code;
-  private final String message;
-  private final String detail;
+  private Integer code;
+  private String message;
+  private String detail;
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private final Object data;
+  private String failure;
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private final T data;
 }

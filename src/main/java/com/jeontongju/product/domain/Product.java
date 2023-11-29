@@ -1,10 +1,11 @@
 package com.jeontongju.product.domain;
 
 import com.jeontongju.product.domain.common.BaseEntity;
-import java.util.UUID;
 import javax.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
+
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -17,8 +18,8 @@ public class Product extends BaseEntity {
   @Id
   @GeneratedValue(generator = "uuid2")
   @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
-  @Column(name = "product_id", columnDefinition = "BINARY(16)")
-  private UUID productId;
+  @Column(name = "product_id", columnDefinition = "VARCHAR(36)")
+  private String productId;
 
   @JoinColumn(name = "category_id")
   @ManyToOne(targetEntity = Category.class, fetch = FetchType.LAZY)
