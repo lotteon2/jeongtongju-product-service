@@ -1,11 +1,11 @@
 package com.jeontongju.product.domain;
 
 import com.jeontongju.product.domain.common.BaseEntity;
+import com.jeontongju.product.dto.request.ProductDto;
+import com.jeontongju.product.dto.temp.SellerInfoDto;
 import javax.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
-
-import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -25,7 +25,7 @@ public class Product extends BaseEntity {
   @ManyToOne(targetEntity = Category.class, fetch = FetchType.LAZY)
   private Category category;
 
-  @Column(name = "seller_id", unique = true, nullable = false)
+  @Column(name = "seller_id", nullable = false)
   private Long sellerId;
 
   @Column(name = "name", nullable = false, length = 30)
@@ -95,4 +95,35 @@ public class Product extends BaseEntity {
   @Builder.Default
   @Column(name = "is_deleted", nullable = false)
   private Boolean isDeleted = false;
+
+  public static Product toEntity(
+          ProductDto productDto, Long sellerId, Category category, SellerInfoDto sellerInfoDto) {
+
+    return Product.builder()
+        .category(category)
+        .sellerId(sellerId)
+        .name(productDto.getProductName())
+        .price(productDto.getProductPrice())
+        .capacityToPriceRatio(
+            Math.round(
+                ((double) productDto.getProductPrice() / productDto.getProductCapacity()) * 100))
+        .description(productDto.getProductDescription())
+        .alcoholDegree(productDto.getProductAlcoholDegree())
+        .capacity(productDto.getProductCapacity())
+        .breweryName(productDto.getBreweryName())
+        .breweryZoneCode(productDto.getBreweryZonecode())
+        .breweryAddress(productDto.getBreweryAddress())
+        .breweryAddressDetails(productDto.getBreweryAddressDetails())
+        .manufacturer(productDto.getManufacturer())
+        .stockQuantity(productDto.getRegisteredQuantity())
+        .productThumbnailImage(
+            ProductThumbnailImage.builder()
+                .imageUrl(productDto.getProductThumbnailImageUrl())
+                .build())
+        .productDetailsImage(
+            ProductDetailsImage.builder().imageUrl(productDto.getProductDetailsImageUrl()).build())
+        .storeName(sellerInfoDto.getStoreName())
+        .storeImageUrl(sellerInfoDto.getStoreImageUrl())
+        .build();
+  }
 }
