@@ -9,6 +9,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.KafkaException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -25,7 +26,7 @@ public class ApiControllerAdvice extends ResponseEntityExceptionHandler {
   private static final String DUPLICATE_KEY_EXCEPTION_MESSAGE = "중복 키 오류 ";
 
   @ExceptionHandler(DomainException.class)
-  public ResponseEntity<ResponseFormat> domainException(DomainException e) {
+  public ResponseEntity<ResponseFormat> handleDomainException(DomainException e) {
     log.error("{PRODUCT}", e.getMessage());
     HttpStatus status = e.getStatus();
     ResponseFormat body =
@@ -39,7 +40,7 @@ public class ApiControllerAdvice extends ResponseEntityExceptionHandler {
   }
 
   @ExceptionHandler(DuplicateKeyException.class)
-  public ResponseEntity<ResponseFormat> duplicateKeyException(DuplicateKeyException e) {
+  public ResponseEntity<ResponseFormat> handleDuplicateKeyException(DuplicateKeyException e) {
     log.error("{PRODUCT}", e.getMessage());
     HttpStatus status = HttpStatus.BAD_REQUEST;
     ResponseFormat body =
@@ -48,6 +49,20 @@ public class ApiControllerAdvice extends ResponseEntityExceptionHandler {
             .message(status.name())
             .detail(DUPLICATE_KEY_EXCEPTION_MESSAGE)
             .build();
+
+    return ResponseEntity.status(status.value()).body(body);
+  }
+
+  @ExceptionHandler(KafkaException.class)
+  public ResponseEntity<ResponseFormat>  handleMethodRedirectException(KafkaException e) {
+    log.error("{PRODUCT}", e.getMessage());
+    HttpStatus status = HttpStatus.SERVICE_UNAVAILABLE;
+    ResponseFormat body =
+            ResponseFormat.builder()
+                    .code(status.value())
+                    .message(status.name())
+                    .detail(e.getMessage())
+                    .build();
 
     return ResponseEntity.status(status.value()).body(body);
   }
@@ -74,7 +89,7 @@ public class ApiControllerAdvice extends ResponseEntityExceptionHandler {
   }
 
   @ExceptionHandler(DataIntegrityViolationException.class)
-  public ResponseEntity<ResponseFormat> constraintViolationException(
+  public ResponseEntity<ResponseFormat> handleConstraintViolationException(
       DataIntegrityViolationException e) {
     log.error("{PRODUCT}", e.getMessage());
     HttpStatus status = HttpStatus.BAD_REQUEST;
@@ -90,7 +105,7 @@ public class ApiControllerAdvice extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(Exception.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  public ResponseEntity<ResponseFormat> exception(Exception e) {
+  public ResponseEntity<ResponseFormat> handleException(Exception e) {
     log.error("{PRODUCT}", e.getMessage());
     HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 

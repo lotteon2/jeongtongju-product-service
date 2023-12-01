@@ -64,9 +64,6 @@ public class ProductService {
     ProductRecodeContents createProductRecode =
         ProductRecodeContents.toDto(savedProduct.getProductId(), productDto, savedProduct);
 
-    // kafka - search
-    sellerProducer.sendCreateProduct(createProductRecode);
-
     // dynamoDB save
     productRecodeRepository.save(
         ProductRecode.builder()
@@ -78,6 +75,10 @@ public class ProductService {
             .createProductRecode(createProductRecode)
             .action("INSERT")
             .build());
+
+    // kafka - search
+    sellerProducer.sendCreateProduct(createProductRecode);
+
     return savedProduct;
   }
 }
