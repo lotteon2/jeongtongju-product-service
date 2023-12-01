@@ -13,6 +13,7 @@ import com.jeontongju.product.dynamodb.repository.ProductRecodeRepository;
 import com.jeontongju.product.exception.CategoryNotFoundException;
 import com.jeontongju.product.exception.common.FeignServerException;
 import com.jeontongju.product.kafka.SellerProducer;
+import com.jeontongju.product.mapper.ProductMapper;
 import com.jeontongju.product.repository.CategoryRepository;
 import com.jeontongju.product.repository.ProductRepository;
 import java.util.List;
@@ -33,6 +34,7 @@ public class ProductService {
   private final SellerServiceClient sellerServiceClient;
   private final SellerProducer sellerProducer;
   private final ProductRecodeRepository productRecodeRepository;
+  private final ProductMapper productMapper;
 
   public List<CategoryDto> getCategoryAll() {
     return categoryRepository.findAll().stream()
@@ -59,7 +61,7 @@ public class ProductService {
 
     // rdb save
     Product savedProduct =
-        productRepository.save(Product.toEntity(productDto, memberId, category, sellerInfoDto));
+        productRepository.save(productMapper.toEntity(productDto, memberId, category, sellerInfoDto));
 
     ProductRecodeContents createProductRecode =
         ProductRecodeContents.toDto(savedProduct.getProductId(), productDto, savedProduct);

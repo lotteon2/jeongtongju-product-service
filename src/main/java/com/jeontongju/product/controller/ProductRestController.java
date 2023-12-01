@@ -32,14 +32,14 @@ public class ProductRestController {
   }
 
   @PostMapping("/products")
-  public ResponseEntity<ResponseFormat> createProduct(
+  public ResponseEntity<ResponseFormat<Void>> createProduct(
           @Valid @RequestBody ProductDto product, @RequestHeader Long memberId, String memberRole) {
 
     productService.createProduct(memberId, product);
 
     return ResponseEntity.ok()
         .body(
-            ResponseFormat.builder()
+            ResponseFormat.<Void>builder()
                 .code(HttpStatus.OK.value())
                 .message(HttpStatus.OK.name())
                 .detail("상품 등록 성공")

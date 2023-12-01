@@ -1,17 +1,16 @@
 package com.jeontongju.product.kafka;
 
-import com.jeontongju.product.dynamodb.domian.ProductRecodeContents;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 @RequiredArgsConstructor
-public class SellerProducer {
+public class SellerProducer<T> {
 
-  private final KafkaTemplate<String, ProductRecodeContents> kafkaTemplate;
+  private final KafkaTemplate<String, T> kafkaTemplate;
 
-  public void sendCreateProduct(ProductRecodeContents createProductRecode) {
+  public void sendCreateProduct(T createProductRecode) {
     kafkaTemplate.send("create-product", createProductRecode);
   }
 }

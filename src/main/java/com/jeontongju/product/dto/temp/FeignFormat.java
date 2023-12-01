@@ -13,17 +13,17 @@ import lombok.Data;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class FeignFormat<T> {
-    private final Long code;
+    private final Integer code;
     private final String message;
     private final String detail;
     private final String failure;
     private final T data;
     @Builder
-    public FeignFormat(Long code, String message, String detail, String failure, Object data) {
+    public FeignFormat(Integer code, String message, String detail, String failure, T data) {
         this.code = code;
         this.message = message;
         this.detail = detail;
         this.failure = failure;
-        this.data = (T) data;
+        this.data = data;
     }
 }
