@@ -18,7 +18,7 @@ public class Product extends BaseEntity {
   @Id
   @GeneratedValue(generator = "uuid2")
   @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
-  @Column(name = "product_id", columnDefinition = "VARCHAR(36)")
+  @Column(name = "product_id", columnDefinition = "CHAR(36)")
   private String productId;
 
   @JoinColumn(name = "category_id")
