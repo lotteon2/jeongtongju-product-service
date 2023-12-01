@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SellerProducer {
 
-  private final KafkaTemplate<String, Object> kafkaTemplate;
+  private final KafkaTemplate<String, ProductRecodeContents> kafkaTemplate;
 
   public void sendCreateProduct(ProductRecodeContents createProductRecode) {
     kafkaTemplate.send("create-product", createProductRecode);

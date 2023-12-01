@@ -61,10 +61,10 @@ public class ProductDto {
   @NotNull(message = "null 이 불가합니다.")
   private Taste taste;
 
-  private List rawMaterial;
+  private List<String> rawMaterial;
 
-  private List food;
+  private List<String> food;
 
-  private List concept;
+  private List<String> concept;
 
 }
