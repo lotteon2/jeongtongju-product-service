@@ -23,7 +23,7 @@ public class ShortsRepositoryTest {
     Shorts shortsEntity =
         Shorts.builder()
             .sellerId(1L)
-            .productId(UUID.randomUUID())
+            .productId(UUID.randomUUID().toString())
             .video("/video/example")
             .thumbnail("/thumbnail/example")
             .title("복순이 복순복순 싸게 팔아요")

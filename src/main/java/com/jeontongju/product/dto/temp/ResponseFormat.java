@@ -11,7 +11,7 @@ import lombok.*;
  */
 @Getter
 @Builder
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class ResponseFormat<T> {
 
   private Integer code;

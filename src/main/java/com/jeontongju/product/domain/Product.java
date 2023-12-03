@@ -5,8 +5,6 @@ import javax.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
-import java.util.UUID;
-
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
@@ -18,14 +16,14 @@ public class Product extends BaseEntity {
   @Id
   @GeneratedValue(generator = "uuid2")
   @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
-  @Column(name = "product_id", columnDefinition = "VARCHAR(36)")
+  @Column(name = "product_id", columnDefinition = "CHAR(36)")
   private String productId;
 
   @JoinColumn(name = "category_id")
   @ManyToOne(targetEntity = Category.class, fetch = FetchType.LAZY)
   private Category category;
 
-  @Column(name = "seller_id", unique = true, nullable = false)
+  @Column(name = "seller_id", nullable = false)
   private Long sellerId;
 
   @Column(name = "name", nullable = false, length = 30)

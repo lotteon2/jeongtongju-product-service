@@ -24,9 +24,8 @@ public class Shorts extends BaseEntity {
     @Column(name = "seller_id", unique = true, nullable = false)
     private Long sellerId;
 
-    @Column(name = "product_id", columnDefinition = "VARCHAR(36)")
-//    @Column(name = "product_id")
-    private UUID productId;
+    @Column(name = "product_id", columnDefinition = "CHAR(36)")
+    private String productId;
 
     @Column(name = "video", nullable = false)
     private String video;
