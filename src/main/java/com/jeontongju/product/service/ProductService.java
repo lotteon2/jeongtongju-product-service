@@ -80,7 +80,7 @@ public class ProductService {
             .build());
 
     // kafka - search
-    productProducer.sendCreateProduct(createProductRecode);
+    productProducer.sendCreateProductToSearch(createProductRecode);
 
     return savedProduct;
   }
@@ -91,6 +91,8 @@ public class ProductService {
     Product product =
         productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
     product.setDeleted(true);
-    productProducer.sendDeleteProduct(productId);
+    productProducer.sendDeleteProductToSearch(productId);
+    productProducer.sendDeleteProductToWish(productId);
+    productProducer.sendDeleteProductToReview(productId);
   }
 }
