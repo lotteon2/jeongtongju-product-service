@@ -93,4 +93,12 @@ public class Product extends BaseEntity {
   @Builder.Default
   @Column(name = "is_deleted", nullable = false)
   private Boolean isDeleted = false;
+
+  public void setActivate(Boolean activate) {
+    this.isActivate = activate;
+  }
+
+  public void setDeleted(Boolean deleted) {
+    this.isDeleted = deleted;
+  }
 }

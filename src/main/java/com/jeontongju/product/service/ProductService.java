@@ -12,8 +12,9 @@ import com.jeontongju.product.dynamodb.domian.ProductRecodeContents;
 import com.jeontongju.product.dynamodb.domian.ProductRecodeId;
 import com.jeontongju.product.dynamodb.repository.ProductRecodeRepository;
 import com.jeontongju.product.exception.CategoryNotFoundException;
+import com.jeontongju.product.exception.ProductNotFoundException;
 import com.jeontongju.product.exception.common.FeignServerException;
-import com.jeontongju.product.kafka.SellerProducer;
+import com.jeontongju.product.kafka.ProductProducer;
 import com.jeontongju.product.mapper.ProductMapper;
 import com.jeontongju.product.repository.CategoryRepository;
 import com.jeontongju.product.repository.ProductRepository;
@@ -33,9 +34,9 @@ public class ProductService {
   private final CategoryRepository categoryRepository;
   private final ProductRepository productRepository;
   private final SellerServiceClient sellerServiceClient;
-  private final SellerProducer sellerProducer;
   private final ProductRecodeRepository productRecodeRepository;
   private final ProductMapper productMapper;
+  private final ProductProducer productProducer;
 
   public List<CategoryDto> getCategoryAll() {
     return categoryRepository.findAll().stream()
@@ -80,7 +81,7 @@ public class ProductService {
             .build());
 
     // kafka - search
-    sellerProducer.sendCreateProduct(createProductRecode);
+    productProducer.sendCreateProduct(createProductRecode);
 
     return savedProduct;
   }
@@ -90,5 +91,14 @@ public class ProductService {
     return productRepository.findBySellerIdWithoutIsDeleted(memberId).stream()
         .map(product -> MyProductInfoDto.toDto(product))
         .collect(Collectors.toList());
+  }
+  
+  @Transactional
+  public void deleteProduct(String productId) {
+
+    Product product =
+        productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
+    product.setDeleted(true);
+    productProducer.sendDeleteProduct(productId);
   }
 }

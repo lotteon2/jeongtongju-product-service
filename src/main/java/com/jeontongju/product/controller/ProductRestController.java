@@ -61,6 +61,23 @@ public class ProductRestController {
                 .message(HttpStatus.OK.name())
                 .detail("내 상품 정보 조회 성공")
                 .data(productService.getMyProductInfo(memberId))
+                .build());    
+}
+  
+  @DeleteMapping("/products/{productId}")
+  public ResponseEntity<ResponseFormat<Void>> deleteProduct(
+      @PathVariable String productId,
+      @RequestHeader Long memberId,
+      @RequestHeader MemberRoleEnum memberRole) {
+
+    productService.deleteProduct(productId);
+
+    return ResponseEntity.ok()
+        .body(
+            ResponseFormat.<Void>builder()
+                .code(HttpStatus.OK.value())
+                .message(HttpStatus.OK.name())
+                .detail("상품 삭제 성공")
                 .build());
   }
 }
