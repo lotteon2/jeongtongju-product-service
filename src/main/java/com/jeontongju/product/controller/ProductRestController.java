@@ -2,6 +2,7 @@ package com.jeontongju.product.controller;
 
 import com.jeontongju.product.dto.request.ProductDto;
 import com.jeontongju.product.dto.response.CategoryDto;
+import com.jeontongju.product.dto.response.MyProductInfoDto;
 import com.jeontongju.product.dto.temp.ResponseFormat;
 import com.jeontongju.product.enums.temp.MemberRoleEnum;
 import com.jeontongju.product.service.ProductService;
@@ -49,6 +50,20 @@ public class ProductRestController {
                 .build());
   }
 
+  @GetMapping("/sellers/info/product")
+  public ResponseEntity<ResponseFormat<List<MyProductInfoDto>>> getMyProductInfo(
+      @RequestHeader Long memberId, @RequestHeader MemberRoleEnum memberRole) {
+
+    return ResponseEntity.ok()
+        .body(
+            ResponseFormat.<List<MyProductInfoDto>>builder()
+                .code(HttpStatus.OK.value())
+                .message(HttpStatus.OK.name())
+                .detail("내 상품 정보 조회 성공")
+                .data(productService.getMyProductInfo(memberId))
+                .build());    
+}
+  
   @DeleteMapping("/products/{productId}")
   public ResponseEntity<ResponseFormat<Void>> deleteProduct(
       @PathVariable String productId,

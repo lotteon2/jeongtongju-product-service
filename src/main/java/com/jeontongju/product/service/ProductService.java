@@ -5,6 +5,7 @@ import com.jeontongju.product.domain.Category;
 import com.jeontongju.product.domain.Product;
 import com.jeontongju.product.dto.request.ProductDto;
 import com.jeontongju.product.dto.response.CategoryDto;
+import com.jeontongju.product.dto.response.MyProductInfoDto;
 import com.jeontongju.product.dto.temp.SellerInfoDto;
 import com.jeontongju.product.dynamodb.domian.ProductRecode;
 import com.jeontongju.product.dynamodb.domian.ProductRecodeContents;
@@ -85,6 +86,13 @@ public class ProductService {
     return savedProduct;
   }
 
+  public List<MyProductInfoDto> getMyProductInfo(Long memberId) {
+
+    return productRepository.findBySellerIdWithoutIsDeleted(memberId).stream()
+        .map(product -> MyProductInfoDto.toDto(product))
+        .collect(Collectors.toList());
+  }
+  
   @Transactional
   public void deleteProduct(String productId) {
 
