@@ -6,11 +6,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class SellerProducer<T> {
+public class ProductProducer<T> {
 
   private final KafkaTemplate<String, T> kafkaTemplate;
 
   public void sendCreateProduct(T createProductRecode) {
     kafkaTemplate.send("create-product", createProductRecode);
   }
+
+  public void sendDeleteProduct(T productId) { kafkaTemplate.send("delete-product", productId);}
+
 }

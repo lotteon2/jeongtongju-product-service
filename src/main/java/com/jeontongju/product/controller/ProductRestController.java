@@ -3,6 +3,7 @@ package com.jeontongju.product.controller;
 import com.jeontongju.product.dto.request.ProductDto;
 import com.jeontongju.product.dto.response.CategoryDto;
 import com.jeontongju.product.dto.temp.ResponseFormat;
+import com.jeontongju.product.enums.temp.MemberRoleEnum;
 import com.jeontongju.product.service.ProductService;
 import java.util.List;
 import javax.validation.Valid;
@@ -33,7 +34,9 @@ public class ProductRestController {
 
   @PostMapping("/products")
   public ResponseEntity<ResponseFormat<Void>> createProduct(
-          @Valid @RequestBody ProductDto product, @RequestHeader Long memberId, String memberRole) {
+      @Valid @RequestBody ProductDto product,
+      @RequestHeader Long memberId,
+      @RequestHeader MemberRoleEnum memberRole) {
 
     productService.createProduct(memberId, product);
 
@@ -43,6 +46,23 @@ public class ProductRestController {
                 .code(HttpStatus.OK.value())
                 .message(HttpStatus.OK.name())
                 .detail("상품 등록 성공")
+                .build());
+  }
+
+  @DeleteMapping("/products/{productId}")
+  public ResponseEntity<ResponseFormat<Void>> deleteProduct(
+      @PathVariable String productId,
+      @RequestHeader Long memberId,
+      @RequestHeader MemberRoleEnum memberRole) {
+
+    productService.deleteProduct(productId);
+
+    return ResponseEntity.ok()
+        .body(
+            ResponseFormat.<Void>builder()
+                .code(HttpStatus.OK.value())
+                .message(HttpStatus.OK.name())
+                .detail("상품 삭제 성공")
                 .build());
   }
 }
