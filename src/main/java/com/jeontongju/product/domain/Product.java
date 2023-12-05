@@ -1,9 +1,12 @@
 package com.jeontongju.product.domain;
 
 import com.jeontongju.product.domain.common.BaseEntity;
+import com.jeontongju.product.dto.request.ModifyProductInfoDto;
 import javax.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
+
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -94,11 +97,57 @@ public class Product extends BaseEntity {
   @Column(name = "is_deleted", nullable = false)
   private Boolean isDeleted = false;
 
+  public void setName(String name) {
+    if (name != null) {
+      this.name = name;
+    }
+  }
+
+  public void setPrice(Long price) {
+    if (price != null) {
+      this.price = price;
+      this.capacityToPriceRatio = Math.round(((double) price / this.capacity * 100));
+    }
+  }
+
+  public void setStockQuantity(Long stockQuantity) {
+    if (stockQuantity != null) {
+      this.stockQuantity = stockQuantity;
+    }
+  }
+
+  public void setProductThumbnailImage(String productThumbnailImageUrl) {
+    if (productThumbnailImageUrl != null) {
+      this.productThumbnailImage.setImageUrl(productThumbnailImageUrl);
+    }
+  }
+
+  public void setProductDetailsImage(String productDetailsImageUrl) {
+    if (productDetailsImageUrl != null) {
+      this.productDetailsImage.setImageUrl(productDetailsImageUrl);
+    }
+  }
+
   public void setActivate(Boolean activate) {
-    this.isActivate = activate;
+    if (activate != null) {
+      this.isActivate = activate;
+    }
   }
 
   public void setDeleted(Boolean deleted) {
     this.isDeleted = deleted;
+  }
+
+  public void modifyProduct(ModifyProductInfoDto modifyProductInfoDto) {
+    setName(modifyProductInfoDto.getProductName());
+    setPrice(modifyProductInfoDto.getProductPrice());
+    setProductThumbnailImage(modifyProductInfoDto.getProductThumbnailImageUrl());
+    setProductDetailsImage(modifyProductInfoDto.getProductDetailsImageUrl());
+    setStockQuantity(modifyProductInfoDto.getRegisteredQuantity());
+    setActivate(modifyProductInfoDto.getIsActivate());
+  }
+  @PreUpdate
+  public void beforeAnyUpdate() {
+    this.setUpdatedAt(LocalDateTime.now());
   }
 }

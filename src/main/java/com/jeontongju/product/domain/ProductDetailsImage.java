@@ -1,6 +1,7 @@
 package com.jeontongju.product.domain;
 
 import com.jeontongju.product.domain.common.BaseEntity;
+import java.time.LocalDateTime;
 import javax.persistence.*;
 import lombok.*;
 
@@ -26,5 +27,14 @@ public class ProductDetailsImage extends BaseEntity {
 
   public void setImageUrl(String imageUrl) {
     this.imageUrl = imageUrl;
+  }
+
+  public void setProduct(Product product) {
+    this.product = product;
+  }
+
+  @PreUpdate
+  public void beforeAnyUpdate() {
+    this.setUpdatedAt(LocalDateTime.now());
   }
 }

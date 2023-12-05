@@ -4,6 +4,8 @@ import com.jeontongju.product.domain.common.BaseEntity;
 import javax.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
@@ -25,5 +27,14 @@ public class ProductThumbnailImage extends BaseEntity {
 
   public void setImageUrl(String imageUrl) {
     this.imageUrl = imageUrl;
+  }
+
+  public void setProduct(Product product) {
+    this.product = product;
+  }
+
+  @PreUpdate
+  public void beforeAnyUpdate() {
+    this.setUpdatedAt(LocalDateTime.now());
   }
 }
