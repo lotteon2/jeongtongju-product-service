@@ -21,4 +21,8 @@ public class BaseEntity {
   @LastModifiedDate
   @Column(name = "updated_at", columnDefinition = "TIMESTAMP")
   private LocalDateTime updatedAt;
+
+  public void setUpdatedAt(LocalDateTime updatedAt) {
+    this.updatedAt = updatedAt;
+  }
 }

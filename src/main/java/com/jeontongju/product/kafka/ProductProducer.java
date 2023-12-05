@@ -25,4 +25,14 @@ public class ProductProducer<T> {
   public void sendDeleteProductToReview(T productId) {
     kafkaTemplate.send("delete-product-to-review", productId);
   }
+
+  public void sendUpdateProductToSearch(T updateProductRecode) {
+    kafkaTemplate.send("update-product-to-search", updateProductRecode);
+  }
+
+  public void sendUpdateProductToReview(T updateProductThumbnailImageUrl) {
+    if (updateProductThumbnailImageUrl != null) {
+      kafkaTemplate.send("update-product-to-review", updateProductThumbnailImageUrl);
+    }
+  }
 }

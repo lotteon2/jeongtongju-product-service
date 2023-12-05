@@ -2,6 +2,7 @@ package com.jeontongju.product.exception.advice;
 
 import com.jeontongju.product.dto.temp.ResponseFormat;
 import com.jeontongju.product.exception.common.DomainException;
+import com.jeontongju.product.exception.common.InvalidPermissionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -35,6 +36,20 @@ public class ApiControllerAdvice extends ResponseEntityExceptionHandler {
             .message(status.name())
             .detail(e.getMessage())
             .build();
+
+    return ResponseEntity.status(status.value()).body(body);
+  }
+
+  @ExceptionHandler(InvalidPermissionException.class)
+  public ResponseEntity<ResponseFormat<Void>> handleInvalidPermissionException(InvalidPermissionException e) {
+    log.error("{PRODUCT}", e.getMessage());
+    HttpStatus status = e.getStatus();
+    ResponseFormat<Void> body =
+            ResponseFormat.<Void>builder()
+                    .code(status.value())
+                    .message(status.name())
+                    .detail(e.getMessage())
+                    .build();
 
     return ResponseEntity.status(status.value()).body(body);
   }

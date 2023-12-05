@@ -1,9 +1,6 @@
 package com.jeontongju.product.dynamodb.domian;
 
 import com.jeontongju.product.domain.Product;
-import com.jeontongju.product.vo.Taste;
-import com.jeontongju.product.dto.request.ProductDto;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -45,14 +42,6 @@ public class ProductRecodeContents {
 
   private Long category;
 
-  private Taste taste;
-
-  private List rawMaterial;
-
-  private List food;
-
-  private List concept;
-
   private Long totalSalesCount;
 
   private Long reviewCount;
@@ -65,8 +54,7 @@ public class ProductRecodeContents {
 
   private Boolean isDeleted;
 
-  public static ProductRecodeContents toDto(
-      String productId, ProductDto productRequestDto, Product savedProduct) {
+  public static ProductRecodeContents toDto(String productId, Product savedProduct) {
 
     return ProductRecodeContents.builder()
         .productId(productId)
@@ -83,10 +71,6 @@ public class ProductRecodeContents {
         .manufacturer(savedProduct.getManufacturer())
         .registeredQuantity(savedProduct.getStockQuantity())
         .category(savedProduct.getCategory().getCategoryId())
-        .taste(productRequestDto.getTaste())
-        .rawMaterial(productRequestDto.getRawMaterial())
-        .concept(productRequestDto.getConcept())
-        .food(productRequestDto.getFood())
         .totalSalesCount(savedProduct.getTotalSalesCount())
         .reviewCount(savedProduct.getReviewCount())
         .storeName(savedProduct.getStoreName())

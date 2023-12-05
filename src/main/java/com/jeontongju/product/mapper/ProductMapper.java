@@ -15,31 +15,38 @@ public class ProductMapper {
   public Product toEntity(
       ProductDto productDto, Long sellerId, Category category, SellerInfoDto sellerInfoDto) {
 
-    return Product.builder()
-        .category(category)
-        .sellerId(sellerId)
-        .name(productDto.getProductName())
-        .price(productDto.getProductPrice())
-        .capacityToPriceRatio(
-            Math.round(
-                ((double) productDto.getProductPrice() / productDto.getProductCapacity()) * 100))
-        .description(productDto.getProductDescription())
-        .alcoholDegree(productDto.getProductAlcoholDegree())
-        .capacity(productDto.getProductCapacity())
-        .breweryName(productDto.getBreweryName())
-        .breweryZoneCode(productDto.getBreweryZonecode())
-        .breweryAddress(productDto.getBreweryAddress())
-        .breweryAddressDetails(productDto.getBreweryAddressDetails())
-        .manufacturer(productDto.getManufacturer())
-        .stockQuantity(productDto.getRegisteredQuantity())
-        .productThumbnailImage(
-            ProductThumbnailImage.builder()
-                .imageUrl(productDto.getProductThumbnailImageUrl())
-                .build())
-        .productDetailsImage(
-            ProductDetailsImage.builder().imageUrl(productDto.getProductDetailsImageUrl()).build())
-        .storeName(sellerInfoDto.getStoreName())
-        .storeImageUrl(sellerInfoDto.getStoreImageUrl())
-        .build();
+    ProductThumbnailImage productThumbnailImage = ProductThumbnailImage.builder()
+            .imageUrl(productDto.getProductThumbnailImageUrl())
+            .build();
+    ProductDetailsImage productDetailsImage = ProductDetailsImage.builder().imageUrl(productDto.getProductDetailsImageUrl()).build();
+    Product product = Product.builder()
+            .category(category)
+            .sellerId(sellerId)
+            .name(productDto.getProductName())
+            .price(productDto.getProductPrice())
+            .capacityToPriceRatio(
+                    Math.round(
+                            ((double) productDto.getProductPrice() / productDto.getProductCapacity()) * 100))
+            .description(productDto.getProductDescription())
+            .alcoholDegree(productDto.getProductAlcoholDegree())
+            .capacity(productDto.getProductCapacity())
+            .breweryName(productDto.getBreweryName())
+            .breweryZoneCode(productDto.getBreweryZonecode())
+            .breweryAddress(productDto.getBreweryAddress())
+            .breweryAddressDetails(productDto.getBreweryAddressDetails())
+            .manufacturer(productDto.getManufacturer())
+            .stockQuantity(productDto.getRegisteredQuantity())
+            .productThumbnailImage(
+                    productThumbnailImage)
+            .productDetailsImage(
+                    productDetailsImage)
+            .storeName(sellerInfoDto.getStoreName())
+            .storeImageUrl(sellerInfoDto.getStoreImageUrl())
+            .build();
+
+    productThumbnailImage.setProduct(product);
+    productDetailsImage.setProduct(product);
+
+    return product;
   }
 }

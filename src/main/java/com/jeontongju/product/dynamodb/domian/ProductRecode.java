@@ -24,7 +24,11 @@ public class ProductRecode {
 
   @DynamoDBAttribute(attributeName = "product")
   @DynamoDBTypeConverted(converter = DynamoDBConfig.ProductRecodeConverter.class)
-  private ProductRecodeContents createProductRecode;
+  private ProductRecodeContents productRecode;
+
+  @DynamoDBAttribute(attributeName = "product_additional")
+  @DynamoDBTypeConverted(converter = DynamoDBConfig.ProductRecodeAdditionalConverter.class)
+  private ProductRecodeAdditionalContents productRecodeAdditionalContents;
 
   @DynamoDBAttribute(attributeName = "action")
   private String action;
