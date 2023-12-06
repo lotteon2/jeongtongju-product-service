@@ -6,7 +6,7 @@ import com.jeontongju.product.domain.Product;
 import com.jeontongju.product.dto.request.ModifyProductInfoDto;
 import com.jeontongju.product.dto.request.ProductDto;
 import com.jeontongju.product.dto.response.CategoryDto;
-import com.jeontongju.product.dto.response.MyProductInfoDto;
+import com.jeontongju.product.dto.response.ProductInfoDto;
 import com.jeontongju.product.dto.temp.SellerInfoDto;
 import com.jeontongju.product.dynamodb.domian.ProductRecode;
 import com.jeontongju.product.dynamodb.domian.ProductRecodeAdditionalContents;
@@ -20,7 +20,6 @@ import com.jeontongju.product.kafka.ProductProducer;
 import com.jeontongju.product.mapper.ProductMapper;
 import com.jeontongju.product.repository.CategoryRepository;
 import com.jeontongju.product.repository.ProductRepository;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -95,13 +94,13 @@ public class ProductService {
     return savedProduct;
   }
 
-  public List<MyProductInfoDto> getMyProductInfo(Long memberId) {
+  public List<ProductInfoDto> getProductInfo(Long memberId) {
 
     return productRepository.findBySellerIdWithoutIsDeleted(memberId).stream()
-        .map(product -> MyProductInfoDto.toDto(product))
+        .map(product -> ProductInfoDto.toDto(product))
         .collect(Collectors.toList());
   }
-  
+
   @Transactional
   public void deleteProduct(String productId) {
 
@@ -121,19 +120,18 @@ public class ProductService {
 
     ProductRecodeContents updateProductRecode = ProductRecodeContents.toDto(productId, product);
     productRecodeRepository.save(
-            ProductRecode.builder()
-                    .productRecodeId(
-                            ProductRecodeId.builder()
-                                    .productId(productId)
-                                    .createdAt(product.getUpdatedAt().toString())
-                                    .build())
-                    .productRecode(updateProductRecode)
-                    .action("UPDATE")
-                    .build());
+        ProductRecode.builder()
+            .productRecodeId(
+                ProductRecodeId.builder()
+                    .productId(productId)
+                    .createdAt(product.getUpdatedAt().toString())
+                    .build())
+            .productRecode(updateProductRecode)
+            .action("UPDATE")
+            .build());
 
     // kafka search
     productProducer.sendUpdateProductToSearch(updateProductRecode);
-
   }
 
   @Transactional

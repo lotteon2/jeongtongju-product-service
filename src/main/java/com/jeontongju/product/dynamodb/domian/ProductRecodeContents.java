@@ -14,15 +14,15 @@ public class ProductRecodeContents {
 
   private String productId;
 
-  private String productName;
+  private String name;
 
-  private String productDescription;
+  private String description;
 
   private String productThumbnailImageUrl;
 
-  private Double productAlcoholDegree;
+  private Double alcoholDegree;
 
-  private Long productCapacity;
+  private Long capacity;
 
   private String breweryName;
 
@@ -34,21 +34,29 @@ public class ProductRecodeContents {
 
   private String manufacturer;
 
-  private Long productPrice;
+  private Long price;
 
-  private Long registeredQuantity;
+  private Long capacityToPriceRatio;
 
-  private String productDetailsImageUrl;
-
-  private Long category;
-
-  private Long totalSalesCount;
+  private Long stockQuantity;
 
   private Long reviewCount;
+
+  private Long totalSalesCount;
 
   private String storeName;
 
   private String storeImageUrl;
+
+  private String productDetailsImageUrl;
+
+  private Long categoryId;
+
+  private Long sellerId;
+
+  private String createdAt;
+
+  private String updatedAt;
 
   private Boolean isActivate;
 
@@ -58,23 +66,28 @@ public class ProductRecodeContents {
 
     return ProductRecodeContents.builder()
         .productId(productId)
-        .productName(savedProduct.getName())
-        .productDescription(savedProduct.getDescription())
+        .name(savedProduct.getName())
+        .description(savedProduct.getDescription())
         .productThumbnailImageUrl(savedProduct.getProductThumbnailImage().getImageUrl())
         .productDetailsImageUrl(savedProduct.getProductDetailsImage().getImageUrl())
-        .productAlcoholDegree(savedProduct.getAlcoholDegree())
-        .productCapacity(savedProduct.getCapacity())
+        .alcoholDegree(savedProduct.getAlcoholDegree())
+        .price(savedProduct.getPrice())
+        .capacityToPriceRatio(savedProduct.getCapacityToPriceRatio())
+        .capacity(savedProduct.getCapacity())
         .breweryName(savedProduct.getBreweryName())
         .breweryZonecode(savedProduct.getBreweryZoneCode())
         .breweryAddress(savedProduct.getBreweryAddress())
         .breweryAddressDetails(savedProduct.getBreweryAddressDetails())
         .manufacturer(savedProduct.getManufacturer())
-        .registeredQuantity(savedProduct.getStockQuantity())
-        .category(savedProduct.getCategory().getCategoryId())
+        .stockQuantity(savedProduct.getStockQuantity())
+        .categoryId(savedProduct.getCategory().getCategoryId())
+        .sellerId(savedProduct.getSellerId())
         .totalSalesCount(savedProduct.getTotalSalesCount())
         .reviewCount(savedProduct.getReviewCount())
         .storeName(savedProduct.getStoreName())
         .storeImageUrl(savedProduct.getStoreImageUrl())
+        .createdAt(savedProduct.getCreatedAt().toString())
+        .updatedAt(savedProduct.getUpdatedAt().toString())
         .isActivate(savedProduct.getIsActivate())
         .isDeleted(savedProduct.getIsDeleted())
         .build();

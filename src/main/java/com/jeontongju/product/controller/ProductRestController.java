@@ -3,7 +3,7 @@ package com.jeontongju.product.controller;
 import com.jeontongju.product.dto.request.ModifyProductInfoDto;
 import com.jeontongju.product.dto.request.ProductDto;
 import com.jeontongju.product.dto.response.CategoryDto;
-import com.jeontongju.product.dto.response.MyProductInfoDto;
+import com.jeontongju.product.dto.response.ProductInfoDto;
 import com.jeontongju.product.dto.temp.ResponseFormat;
 import com.jeontongju.product.enums.temp.MemberRoleEnum;
 import com.jeontongju.product.exception.common.InvalidPermissionException;
@@ -53,18 +53,32 @@ public class ProductRestController {
   }
 
   @GetMapping("/sellers/info/product")
-  public ResponseEntity<ResponseFormat<List<MyProductInfoDto>>> getMyProductInfo(
+  public ResponseEntity<ResponseFormat<List<ProductInfoDto>>> getMyProductInfo(
       @RequestHeader Long memberId, @RequestHeader MemberRoleEnum memberRole) {
 
     return ResponseEntity.ok()
         .body(
-            ResponseFormat.<List<MyProductInfoDto>>builder()
+            ResponseFormat.<List<ProductInfoDto>>builder()
                 .code(HttpStatus.OK.value())
                 .message(HttpStatus.OK.name())
                 .detail("내 상품 정보 조회 성공")
-                .data(productService.getMyProductInfo(memberId))
+                .data(productService.getProductInfo(memberId))
                 .build());    
 }
+
+  @GetMapping("/sellers/{sellerId}/info/product")
+  public ResponseEntity<ResponseFormat<List<ProductInfoDto>>> getProductInfo(
+          @RequestHeader Long memberId, @RequestHeader MemberRoleEnum memberRole, @PathVariable Long sellerId) {
+
+    return ResponseEntity.ok()
+            .body(
+                    ResponseFormat.<List<ProductInfoDto>>builder()
+                            .code(HttpStatus.OK.value())
+                            .message(HttpStatus.OK.name())
+                            .detail("특정 셀러 상품 정보 조회 성공")
+                            .data(productService.getProductInfo(sellerId))
+                            .build());
+  }
   
   @DeleteMapping("/products/{productId}")
   public ResponseEntity<ResponseFormat<Void>> deleteProduct(
