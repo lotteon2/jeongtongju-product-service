@@ -12,8 +12,8 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConverter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jeontongju.product.dynamodb.domian.ProductRecodeAdditionalContents;
-import com.jeontongju.product.dynamodb.domian.ProductRecodeContents;
+import com.jeontongju.product.dynamodb.domian.ProductProductRecordAdditionalContents;
+import com.jeontongju.product.dynamodb.domian.ProductRecordContents;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
@@ -78,10 +78,10 @@ public class DynamoDBConfig {
   }
 
   public static class ProductRecodeConverter
-      implements DynamoDBTypeConverter<String, ProductRecodeContents> {
+      implements DynamoDBTypeConverter<String, ProductRecordContents> {
 
     @Override
-    public String convert(ProductRecodeContents productRecodeContents) {
+    public String convert(ProductRecordContents productRecodeContents) {
       ObjectMapper objectMapper = new ObjectMapper();
       String jsonStr = null;
 
@@ -94,12 +94,12 @@ public class DynamoDBConfig {
     }
 
     @Override
-    public ProductRecodeContents unconvert(String s) {
+    public ProductRecordContents unconvert(String s) {
 
       ObjectMapper objectMapper = new ObjectMapper();
-      ProductRecodeContents productRecodeContents = new ProductRecodeContents();
+      ProductRecordContents productRecodeContents = new ProductRecordContents();
       try {
-        productRecodeContents = objectMapper.readValue(s, ProductRecodeContents.class);
+        productRecodeContents = objectMapper.readValue(s, ProductRecordContents.class);
       } catch (Exception e) {
         log.error(e.getMessage());
       }
@@ -108,10 +108,10 @@ public class DynamoDBConfig {
   }
 
   public static class ProductRecodeAdditionalConverter
-      implements DynamoDBTypeConverter<String, ProductRecodeAdditionalContents> {
+      implements DynamoDBTypeConverter<String, ProductProductRecordAdditionalContents> {
 
     @Override
-    public String convert(ProductRecodeAdditionalContents productRecodeAdditionalContents) {
+    public String convert(ProductProductRecordAdditionalContents productRecodeAdditionalContents) {
       ObjectMapper objectMapper = new ObjectMapper();
       String jsonStr = null;
 
@@ -124,14 +124,14 @@ public class DynamoDBConfig {
     }
 
     @Override
-    public ProductRecodeAdditionalContents unconvert(String s) {
+    public ProductProductRecordAdditionalContents unconvert(String s) {
 
       ObjectMapper objectMapper = new ObjectMapper();
-      ProductRecodeAdditionalContents productRecodeAdditionalContents =
-          new ProductRecodeAdditionalContents();
+      ProductProductRecordAdditionalContents productRecodeAdditionalContents =
+          new ProductProductRecordAdditionalContents();
       try {
         productRecodeAdditionalContents =
-            objectMapper.readValue(s, ProductRecodeAdditionalContents.class);
+            objectMapper.readValue(s, ProductProductRecordAdditionalContents.class);
       } catch (Exception e) {
         log.error(e.getMessage());
       }

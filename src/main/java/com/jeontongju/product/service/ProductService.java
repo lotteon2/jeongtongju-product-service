@@ -6,21 +6,25 @@ import com.jeontongju.product.domain.Product;
 import com.jeontongju.product.dto.request.ModifyProductInfoDto;
 import com.jeontongju.product.dto.request.ProductDto;
 import com.jeontongju.product.dto.response.CategoryDto;
-import com.jeontongju.product.dto.response.ProductInfoDto;
+import com.jeontongju.product.dto.response.GetProductInfoDto;
+import com.jeontongju.product.dto.temp.ProductInfoDto;
+import com.jeontongju.product.dto.temp.ProductSearchDto;
+import com.jeontongju.product.dto.temp.ProductUpdateDto;
 import com.jeontongju.product.dto.temp.SellerInfoDto;
-import com.jeontongju.product.dynamodb.domian.ProductRecode;
-import com.jeontongju.product.dynamodb.domian.ProductRecodeAdditionalContents;
-import com.jeontongju.product.dynamodb.domian.ProductRecodeContents;
-import com.jeontongju.product.dynamodb.domian.ProductRecodeId;
-import com.jeontongju.product.dynamodb.repository.ProductRecodeRepository;
+import com.jeontongju.product.dynamodb.domian.ProductProductRecordAdditionalContents;
+import com.jeontongju.product.dynamodb.domian.ProductRecord;
+import com.jeontongju.product.dynamodb.domian.ProductRecordContents;
+import com.jeontongju.product.dynamodb.domian.ProductRecordId;
+import com.jeontongju.product.dynamodb.repository.ProductRecordRepository;
 import com.jeontongju.product.exception.CategoryNotFoundException;
 import com.jeontongju.product.exception.ProductNotFoundException;
-import com.jeontongju.product.exception.common.FeignServerException;
+import com.jeontongju.product.exception.common.ProductOrderException;
 import com.jeontongju.product.kafka.ProductProducer;
 import com.jeontongju.product.mapper.ProductMapper;
 import com.jeontongju.product.repository.CategoryRepository;
 import com.jeontongju.product.repository.ProductRepository;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +41,7 @@ public class ProductService {
   private final CategoryRepository categoryRepository;
   private final ProductRepository productRepository;
   private final SellerServiceClient sellerServiceClient;
-  private final ProductRecodeRepository productRecodeRepository;
+  private final ProductRecordRepository productRecodeRepository;
   private final ProductMapper productMapper;
   private final ProductProducer productProducer;
 
@@ -45,11 +49,6 @@ public class ProductService {
     return categoryRepository.findAll().stream()
         .map(CategoryDto::toDto)
         .collect(Collectors.toList());
-  }
-
-  private void sellerFeignServerException(Exception exception) {
-    log.error(exception.getMessage());
-    throw new FeignServerException("seller-service 가 정상적으로 동작하지 않습니다.");
   }
 
   @Transactional
@@ -70,16 +69,16 @@ public class ProductService {
             productMapper.toEntity(productDto, memberId, category, sellerInfoDto));
 
     // dynamoDB save
-    ProductRecodeContents createProductRecode =
-        ProductRecodeContents.toDto(savedProduct.getProductId(), savedProduct);
+    ProductRecordContents createProductRecode =
+        ProductRecordContents.toDto(savedProduct.getProductId(), savedProduct, null);
 
-    ProductRecodeAdditionalContents createProductRecodeAdditionalContents =
-        ProductRecodeAdditionalContents.toDto(savedProduct.getProductId(), productDto);
+    ProductProductRecordAdditionalContents createProductRecodeAdditionalContents =
+        ProductProductRecordAdditionalContents.toDto(savedProduct.getProductId(), productDto);
 
     productRecodeRepository.save(
-        ProductRecode.builder()
+        ProductRecord.builder()
             .productRecodeId(
-                ProductRecodeId.builder()
+                ProductRecordId.builder()
                     .productId(savedProduct.getProductId())
                     .createdAt(LocalDateTime.now().toString())
                     .build())
@@ -94,10 +93,10 @@ public class ProductService {
     return savedProduct;
   }
 
-  public List<ProductInfoDto> getProductInfo(Long memberId) {
+  public List<GetProductInfoDto> getProductInfo(Long memberId) {
 
     return productRepository.findBySellerIdWithoutIsDeleted(memberId).stream()
-        .map(product -> ProductInfoDto.toDto(product))
+        .map(product -> GetProductInfoDto.toDto(product))
         .collect(Collectors.toList());
   }
 
@@ -118,11 +117,12 @@ public class ProductService {
         productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
     product.setActivate(isActivate);
 
-    ProductRecodeContents updateProductRecode = ProductRecodeContents.toDto(productId, product);
+    ProductRecordContents updateProductRecode =
+        ProductRecordContents.toDto(productId, product, null);
     productRecodeRepository.save(
-        ProductRecode.builder()
+        ProductRecord.builder()
             .productRecodeId(
-                ProductRecodeId.builder()
+                ProductRecordId.builder()
                     .productId(productId)
                     .createdAt(product.getUpdatedAt().toString())
                     .build())
@@ -141,12 +141,13 @@ public class ProductService {
     product.modifyProduct(modifyProductInfoDto);
 
     // 변경 이력 - dynamo db
-    ProductRecodeContents updateProductRecode = ProductRecodeContents.toDto(productId, product);
+    ProductRecordContents updateProductRecode =
+        ProductRecordContents.toDto(productId, product, null);
 
     productRecodeRepository.save(
-        ProductRecode.builder()
+        ProductRecord.builder()
             .productRecodeId(
-                ProductRecodeId.builder()
+                ProductRecordId.builder()
                     .productId(productId)
                     .createdAt(LocalDateTime.now().toString())
                     .build())
@@ -157,5 +158,30 @@ public class ProductService {
     // kafka review, search
     productProducer.sendUpdateProductToSearch(updateProductRecode);
     productProducer.sendUpdateProductToReview(modifyProductInfoDto.getProductThumbnailImageUrl());
+  }
+
+  public List<ProductInfoDto> getProductInfoForOrder(ProductSearchDto productSearchDto) {
+
+    List<ProductInfoDto> productInfoDtoList = new ArrayList<>();
+    long actualTotalPrice = 0L;
+    for (ProductUpdateDto orderedProduct : productSearchDto.getProductUpdateDtoList()) {
+
+      ProductInfoDto productInfoDto =
+          productRepository
+              .findByProductIdsForOrder(orderedProduct.getProductId())
+              .orElseThrow(ProductNotFoundException::new);
+
+      if (productInfoDto.getProductCount() < orderedProduct.getProductCount()) {
+        throw new ProductOrderException("재고가 부족합니다.");
+      }
+      actualTotalPrice += productInfoDto.getProductPrice() * orderedProduct.getProductCount();
+      productInfoDtoList.add(productInfoDto);
+    }
+
+    if (actualTotalPrice != productSearchDto.getTotalPrice()) {
+      throw new ProductOrderException("총 가격이 일치하지 않습니다.");
+    }
+
+    return productInfoDtoList;
   }
 }
