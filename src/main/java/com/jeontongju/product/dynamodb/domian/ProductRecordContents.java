@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ProductRecodeContents {
+public class ProductRecordContents {
 
   private String productId;
 
@@ -54,6 +54,8 @@ public class ProductRecodeContents {
 
   private Long sellerId;
 
+  private Long shortsId;
+
   private String createdAt;
 
   private String updatedAt;
@@ -62,9 +64,9 @@ public class ProductRecodeContents {
 
   private Boolean isDeleted;
 
-  public static ProductRecodeContents toDto(String productId, Product savedProduct) {
+  public static ProductRecordContents toDto(String productId, Product savedProduct, Long shortsId) {
 
-    return ProductRecodeContents.builder()
+    return ProductRecordContents.builder()
         .productId(productId)
         .name(savedProduct.getName())
         .description(savedProduct.getDescription())
@@ -82,6 +84,7 @@ public class ProductRecodeContents {
         .stockQuantity(savedProduct.getStockQuantity())
         .categoryId(savedProduct.getCategory().getCategoryId())
         .sellerId(savedProduct.getSellerId())
+        .shortsId(shortsId)
         .totalSalesCount(savedProduct.getTotalSalesCount())
         .reviewCount(savedProduct.getReviewCount())
         .storeName(savedProduct.getStoreName())

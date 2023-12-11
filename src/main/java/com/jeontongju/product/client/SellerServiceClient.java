@@ -6,7 +6,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "sellerServiceClient", url = "${endpoint.seller-service}")
+@FeignClient(name = "seller-service")
 public interface SellerServiceClient {
 
   @GetMapping("/sellers/{sellerId}/name-image")

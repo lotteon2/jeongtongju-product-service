@@ -18,17 +18,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @DynamoDBTable(tableName = "product_recode")
-public class ProductRecode {
+public class ProductRecord {
 
-  @Id private ProductRecodeId productRecodeId;
+  @Id private ProductRecordId productRecodeId;
 
   @DynamoDBAttribute(attributeName = "product")
   @DynamoDBTypeConverted(converter = DynamoDBConfig.ProductRecodeConverter.class)
-  private ProductRecodeContents productRecode;
+  private ProductRecordContents productRecode;
 
   @DynamoDBAttribute(attributeName = "product_additional")
   @DynamoDBTypeConverted(converter = DynamoDBConfig.ProductRecodeAdditionalConverter.class)
-  private ProductRecodeAdditionalContents productRecodeAdditionalContents;
+  private ProductProductRecordAdditionalContents productRecodeAdditionalContents;
 
   @DynamoDBAttribute(attributeName = "action")
   private String action;
@@ -40,7 +40,7 @@ public class ProductRecode {
 
   public void setProductId(String productId) {
     if (productRecodeId == null) {
-      productRecodeId = new ProductRecodeId();
+      productRecodeId = new ProductRecordId();
     }
     productRecodeId.setProductId(productId);
   }
@@ -52,7 +52,7 @@ public class ProductRecode {
 
   public void setCreatedAt(String createdAt) {
     if (productRecodeId == null) {
-      productRecodeId = new ProductRecodeId();
+      productRecodeId = new ProductRecordId();
     }
     productRecodeId.setCreatedAt(createdAt);
   }

@@ -7,13 +7,13 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductInfoDto {
+public class GetProductInfoDto {
 
   private String value;
   private String label;
 
-  public static ProductInfoDto toDto(Product product) {
-    return ProductInfoDto.builder()
+  public static GetProductInfoDto toDto(Product product) {
+    return GetProductInfoDto.builder()
         .label(product.getProductId())
         .value(product.getName())
         .build();
