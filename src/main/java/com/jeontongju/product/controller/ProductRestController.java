@@ -97,7 +97,7 @@ public class ProductRestController {
                 .build());
   }
 
-  @PatchMapping("products/{productId}")
+  @PatchMapping("/products/{productId}")
   public ResponseEntity<ResponseFormat<Void>> modifyProduct(
       @PathVariable String productId,
       @Valid @RequestBody ModifyProductInfoDto modifyProductInfoDto,

@@ -22,7 +22,6 @@ public class ProductDto {
   @NotBlank(message = "null 이 불가합니다.")
   private String productDescription;
 
-  @NotBlank(message = "null 이 불가합니다.")
   private String productThumbnailImageUrl;
 
   @DecimalMax(value = "9.9", message = "소수점 첫째 자리까지만 입력 가능합니다.")
@@ -52,7 +51,6 @@ public class ProductDto {
   @NotNull(message = "null 이 불가합니다.")
   private Long registeredQuantity;
 
-  @NotBlank(message = "내용은 null 이 불가합니다.")
   private String productDetailsImageUrl;
 
   @NotNull(message = "null 이 불가합니다.")
