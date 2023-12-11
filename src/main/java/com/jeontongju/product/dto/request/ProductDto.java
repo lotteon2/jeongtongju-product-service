@@ -24,7 +24,6 @@ public class ProductDto {
 
   private String productThumbnailImageUrl;
 
-  @DecimalMax(value = "9.9", message = "소수점 첫째 자리까지만 입력 가능합니다.")
   @NotNull(message = "null 이 불가합니다.")
   private Double productAlcoholDegree;
 
