@@ -60,7 +60,7 @@ public class ProductDto {
   @NotNull(message = "null 이 불가합니다.")
   private Taste taste;
 
-  @Size(max = 2, min = 1, message = "최대 2개의 항목을 가져야 합니다.")
+  @Size(max = 2, min = 1, message = "1개 또는 2개 항목을 가져야 합니다.")
   private List<String> rawMaterial;
 
   private List<String> food;
