@@ -14,8 +14,8 @@ public class GetProductInfoDto {
 
   public static GetProductInfoDto toDto(Product product) {
     return GetProductInfoDto.builder()
-        .label(product.getProductId())
-        .value(product.getName())
+        .label(product.getName())
+        .value(product.getProductId())
         .build();
   }
 }
