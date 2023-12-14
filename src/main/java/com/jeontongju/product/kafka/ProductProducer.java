@@ -35,4 +35,17 @@ public class ProductProducer<T> {
       kafkaTemplate.send("update-product-to-review", updateProductThumbnailImageUrl);
     }
   }
+
+  // create order / 상품에서 주문으로 재고 성공으로 보내기
+  public void createOrder() {
+
+  }
+
+  // 롤백 터져서 주문 취소로, 상품에서 쿠폰-포인트 세 개 중에 하나로 보내기
+  public void rollbackOrder() {
+  }
+
+
+
+
 }

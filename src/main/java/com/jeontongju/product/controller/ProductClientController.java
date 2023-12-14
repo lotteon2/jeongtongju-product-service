@@ -1,9 +1,10 @@
 package com.jeontongju.product.controller;
 
-import com.jeontongju.product.dto.temp.FeignFormat;
-import com.jeontongju.product.dto.temp.ProductInfoDto;
-import com.jeontongju.product.dto.temp.ProductSearchDto;
+
 import com.jeontongju.product.service.ProductService;
+import io.github.bitbox.bitbox.dto.FeignFormat;
+import io.github.bitbox.bitbox.dto.ProductInfoDto;
+import io.github.bitbox.bitbox.dto.ProductSearchDto;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -4,12 +4,13 @@ import com.jeontongju.product.dto.request.ModifyProductInfoDto;
 import com.jeontongju.product.dto.request.ProductDto;
 import com.jeontongju.product.dto.response.CategoryDto;
 import com.jeontongju.product.dto.response.GetProductInfoDto;
-import com.jeontongju.product.dto.temp.ResponseFormat;
-import com.jeontongju.product.enums.temp.MemberRoleEnum;
 import com.jeontongju.product.exception.common.InvalidPermissionException;
 import com.jeontongju.product.service.ProductService;
 import java.util.List;
 import javax.validation.Valid;
+
+import io.github.bitbox.bitbox.dto.ResponseFormat;
+import io.github.bitbox.bitbox.enums.MemberRoleEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
