@@ -1,47 +1,79 @@
 package com.jeontongju.product.kafka;
 
+import com.jeontongju.product.service.ProductService;
 import io.github.bitbox.bitbox.dto.OrderInfoDto;
+import io.github.bitbox.bitbox.dto.ProductUpdateDto;
 import io.github.bitbox.bitbox.dto.SellerInfoDto;
+import io.github.bitbox.bitbox.util.KafkaTopicNameInfo;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ProductConsumer {
 
-  @KafkaListener(topics = "delete-seller-to-product")
-  public void deleteSellerToProduct(Long sellerId) {
+  private final ProductService productService;
+  private final ProductProducer productProducer;
+
+  @KafkaListener(topics = KafkaTopicNameInfo.DELETE_SELLER_TO_PRODUCT)
+  public void deleteProductFromSeller(Long sellerId) {
     // 탈퇴 시키기
   }
 
-  @KafkaListener(topics = "update-seller")
-  public void updateSeller(SellerInfoDto sellerInfoDto) {
+  @KafkaListener(topics = KafkaTopicNameInfo.UPDATE_SELLER_TO_PRODUCT)
+  public void updateProductFromSeller(SellerInfoDto sellerInfoDto) {
     // 수정 시키기
   }
 
-  @KafkaListener(topics = "reduce-stock")
-  public void reductStock (OrderInfoDto orderInfoDto)  {
-    // 재고 확인 및 차감
+  @KafkaListener(topics = KafkaTopicNameInfo.REDUCE_STOCK)
+  public void reduceStockFromOrder(OrderInfoDto orderInfoDto) {
 
+    try {
+      // 재고 차감
+      productService.reduceStock(orderInfoDto.getProductUpdateDto());
+
+      // order-service 에 create-order 보내기
+      productProducer.createOrderToOrder(orderInfoDto);
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      sendOrderInfoDto(orderInfoDto); // 롤백
+    }
   }
 
-  @KafkaListener(topics = "add-stock")
-  public void orderProduct ( )  {
-    // 주문에서 터져서 롤백
-
+  @KafkaListener(topics = KafkaTopicNameInfo.ADD_STOCK)
+  public void addStockFromOrder(OrderInfoDto orderInfoDto) { // 주문에서 터져서 롤백
+    // 재고 되돌리기
+    try {
+      productService.rollbackStock(orderInfoDto.getProductUpdateDto());
+    } catch (Exception e) {
+      log.error(e.getMessage());
+    } finally {
+      sendOrderInfoDto(orderInfoDto);
+    }
   }
 
-  @KafkaListener(topics = "update-product-sales-count")
-  public void updateProductSalesCount( )  {
-    // 주문 확정으로 상품 판매 개수 추가
-
+  @KafkaListener(topics = KafkaTopicNameInfo.UPDATE_PRODUCT_SALES_COUNT)
+  public void updateProductSalesCountFromOrder(List<ProductUpdateDto> productUpdateDtoList) {
+    // TODO 주문 확정으로 상품 판매 개수 증가
   }
 
-  @KafkaListener(topics = "cancel-order-stock")
-  public void cancelOrderStock( )  {
-    // 주문 취소 시 상품 재고 돌리기
-
+  @KafkaListener(topics = KafkaTopicNameInfo.CANCEL_ORDER_STOCK)
+  public void addStockFromCancelOrder(List<ProductUpdateDto> productUpdateDtoList) {
+    productService.rollbackStock(productUpdateDtoList);
+    // TODO 상품 판매 개수 차감
   }
 
+  public void sendOrderInfoDto(OrderInfoDto orderInfoDto) {
+    if (orderInfoDto.getUserCouponUpdateDto().getCouponCode() != null) {
+      // 쿠폰
+      productProducer.rollbackCouponByCancel(orderInfoDto);
+    } else if (orderInfoDto.getUserPointUpdateDto().getPoint() != null) {
+      // 포인트
+      productProducer.addPointByCancel(orderInfoDto);
+    }
+  }
 }

@@ -6,11 +6,10 @@ import com.jeontongju.product.dto.response.CategoryDto;
 import com.jeontongju.product.dto.response.GetProductInfoDto;
 import com.jeontongju.product.exception.common.InvalidPermissionException;
 import com.jeontongju.product.service.ProductService;
-import java.util.List;
-import javax.validation.Valid;
-
 import io.github.bitbox.bitbox.dto.ResponseFormat;
 import io.github.bitbox.bitbox.enums.MemberRoleEnum;
+import java.util.List;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,23 +63,25 @@ public class ProductRestController {
                 .message(HttpStatus.OK.name())
                 .detail("내 상품 정보 조회 성공")
                 .data(productService.getProductInfo(memberId))
-                .build());    
-}
+                .build());
+  }
 
   @GetMapping("/sellers/{sellerId}/info/product")
   public ResponseEntity<ResponseFormat<List<GetProductInfoDto>>> getProductInfo(
-          @RequestHeader Long memberId, @RequestHeader MemberRoleEnum memberRole, @PathVariable Long sellerId) {
+      @RequestHeader Long memberId,
+      @RequestHeader MemberRoleEnum memberRole,
+      @PathVariable Long sellerId) {
 
     return ResponseEntity.ok()
-            .body(
-                    ResponseFormat.<List<GetProductInfoDto>>builder()
-                            .code(HttpStatus.OK.value())
-                            .message(HttpStatus.OK.name())
-                            .detail("특정 셀러 상품 정보 조회 성공")
-                            .data(productService.getProductInfo(sellerId))
-                            .build());
+        .body(
+            ResponseFormat.<List<GetProductInfoDto>>builder()
+                .code(HttpStatus.OK.value())
+                .message(HttpStatus.OK.name())
+                .detail("특정 셀러 상품 정보 조회 성공")
+                .data(productService.getProductInfo(sellerId))
+                .build());
   }
-  
+
   @DeleteMapping("/products/{productId}")
   public ResponseEntity<ResponseFormat<Void>> deleteProduct(
       @PathVariable String productId,

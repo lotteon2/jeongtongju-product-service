@@ -14,7 +14,8 @@ import com.jeontongju.product.dynamodb.domian.ProductRecordId;
 import com.jeontongju.product.dynamodb.repository.ProductRecordRepository;
 import com.jeontongju.product.exception.CategoryNotFoundException;
 import com.jeontongju.product.exception.ProductNotFoundException;
-import com.jeontongju.product.exception.common.ProductOrderException;
+import com.jeontongju.product.exception.ProductOrderException;
+import com.jeontongju.product.exception.StockException;
 import com.jeontongju.product.kafka.ProductProducer;
 import com.jeontongju.product.mapper.ProductMapper;
 import com.jeontongju.product.repository.CategoryRepository;
@@ -84,6 +85,8 @@ public class ProductService {
                     .build())
             .productRecode(createProductRecode)
             .productRecodeAdditionalContents(createProductRecodeAdditionalContents)
+            .reviewCount(0L)
+            .totalSalesCount(0L)
             .action("INSERT")
             .build());
 
@@ -183,5 +186,34 @@ public class ProductService {
     }
 
     return productInfoDtoList;
+  }
+
+  @Transactional
+  public void reduceStock(List<ProductUpdateDto> productUpdateDtoList) {
+    for (ProductUpdateDto productUpdateDto : productUpdateDtoList) {
+
+      Product product =
+          productRepository
+              .findByProductIdForUpdateStock(productUpdateDto.getProductId()) // pessimistic lock
+              .orElseThrow(() -> new StockException("존재 하지 않는 상품"));
+
+      if (productUpdateDto.getProductCount() > product.getStockQuantity()) {
+        throw new StockException("재고 부족");
+      }
+      // 재고 차감
+      product.setStockQuantity(product.getStockQuantity() - productUpdateDto.getProductCount());
+    }
+  }
+
+  @Transactional
+  public void rollbackStock(List<ProductUpdateDto> productUpdateDtoList) {
+    for (ProductUpdateDto productUpdateDto : productUpdateDtoList) {
+      Product product =
+          productRepository
+              .findByProductIdForUpdateStock(productUpdateDto.getProductId()) // pessimistic lock
+              .orElseThrow(() -> new StockException("존재 하지 않는 상품"));
+      // 재고 복구
+      product.setStockQuantity(product.getStockQuantity() + productUpdateDto.getProductCount());
+    }
   }
 }

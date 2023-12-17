@@ -6,8 +6,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import javax.persistence.LockModeType;
 
 public interface ProductRepository extends JpaRepository<Product, String> {
 
@@ -16,5 +19,9 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 
   @Query("SELECT new io.github.bitbox.bitbox.dto.ProductInfoDto(p.productId, p.name, p.price, p.stockQuantity, p.sellerId, p.storeName, p.productThumbnailImage.imageUrl) FROM Product p WHERE p.productId = :productId AND p.isDeleted = false AND p.isActivate = true")
   Optional<ProductInfoDto> findByProductIdsForOrder(@Param("productId") String productId);
+
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query("SELECT p FROM Product p where p.productId = :productId")
+  Optional<Product> findByProductIdForUpdateStock(String productId);
 
 }
