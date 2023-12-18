@@ -35,6 +35,7 @@ public class ProductConsumer {
     try {
       // 재고 차감
       productService.reduceStock(orderInfoDto.getProductUpdateDto());
+      log.info(orderInfoDto.getProductUpdateDto().toString());
 
       // order-service 에 create-order 보내기
       productProducer.createOrderToOrder(orderInfoDto);
