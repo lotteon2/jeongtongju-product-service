@@ -33,12 +33,6 @@ public class ProductRecord {
   @DynamoDBAttribute(attributeName = "action")
   private String action;
 
-  @DynamoDBAttribute(attributeName = "review_count")
-  private Long reviewCount;
-
-  @DynamoDBAttribute(attributeName = "total_sales_count")
-  private Long totalSalesCount;
-
   @DynamoDBHashKey(attributeName = "product_id")
   public String getProductId() {
     return productRecodeId != null ? productRecodeId.getProductId() : null;
