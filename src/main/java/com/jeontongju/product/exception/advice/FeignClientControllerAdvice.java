@@ -1,8 +1,8 @@
 package com.jeontongju.product.exception.advice;
 
-import com.jeontongju.product.dto.temp.FeignFormat;
-import com.jeontongju.product.dto.temp.ResponseFormat;
 import com.jeontongju.product.exception.common.FeignException;
+import io.github.bitbox.bitbox.dto.FeignFormat;
+import io.github.bitbox.bitbox.dto.ResponseFormat;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.client.circuitbreaker.NoFallbackAvailableException;

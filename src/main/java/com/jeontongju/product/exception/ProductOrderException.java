@@ -1,5 +1,6 @@
-package com.jeontongju.product.exception.common;
+package com.jeontongju.product.exception;
 
+import com.jeontongju.product.exception.common.FeignException;
 import org.springframework.http.HttpStatus;
 
 public class ProductOrderException extends FeignException {

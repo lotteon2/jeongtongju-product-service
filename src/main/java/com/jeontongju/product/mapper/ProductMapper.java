@@ -5,7 +5,7 @@ import com.jeontongju.product.domain.Product;
 import com.jeontongju.product.domain.ProductDetailsImage;
 import com.jeontongju.product.domain.ProductThumbnailImage;
 import com.jeontongju.product.dto.request.ProductDto;
-import com.jeontongju.product.dto.temp.SellerInfoDto;
+import io.github.bitbox.bitbox.dto.SellerInfoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

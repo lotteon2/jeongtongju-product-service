@@ -75,14 +75,6 @@ public class Product extends BaseEntity {
       cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
   private ProductDetailsImage productDetailsImage;
 
-  @Builder.Default
-  @Column(name = "total_sales_count", nullable = false)
-  private Long totalSalesCount = 0L;
-
-  @Builder.Default
-  @Column(name = "review_count", nullable = false)
-  private Long reviewCount = 0L;
-
   @Column(name = "store_image_url", nullable = false)
   private String storeImageUrl;
 
