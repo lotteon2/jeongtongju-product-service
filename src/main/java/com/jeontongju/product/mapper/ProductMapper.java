@@ -5,6 +5,9 @@ import com.jeontongju.product.domain.Product;
 import com.jeontongju.product.domain.ProductDetailsImage;
 import com.jeontongju.product.domain.ProductThumbnailImage;
 import com.jeontongju.product.dto.request.ProductDto;
+import io.github.bitbox.bitbox.dto.ProductInfoDto;
+import io.github.bitbox.bitbox.dto.ProductSearchDto;
+import io.github.bitbox.bitbox.dto.ProductUpdateDto;
 import io.github.bitbox.bitbox.dto.SellerInfoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -48,5 +51,18 @@ public class ProductMapper {
     productDetailsImage.setProduct(product);
 
     return product;
+  }
+
+  public ProductInfoDto toProductInfoDto(Product product, ProductUpdateDto productUpdateDto) {
+
+    return ProductInfoDto.builder()
+            .productId(product.getProductId())
+            .productName(product.getName())
+            .productPrice(product.getPrice())
+            .productCount(productUpdateDto.getProductCount())
+            .sellerId(product.getSellerId())
+            .sellerName(product.getStoreName())
+            .productImg(product.getProductThumbnailImage().getImageUrl())
+            .build();
   }
 }

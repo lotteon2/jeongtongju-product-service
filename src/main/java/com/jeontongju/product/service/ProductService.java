@@ -168,9 +168,10 @@ public class ProductService {
     for (ProductUpdateDto orderedProduct : productSearchDto.getProductUpdateDtoList()) {
 
       ProductInfoDto productInfoDto =
+              productMapper.toProductInfoDto(
           productRepository
               .findByProductIdsForOrder(orderedProduct.getProductId())
-              .orElseThrow(ProductNotFoundException::new);
+              .orElseThrow(ProductNotFoundException::new), orderedProduct);
 
       if (productInfoDto.getProductCount() < orderedProduct.getProductCount()) {
         log.error("재고 부족");
