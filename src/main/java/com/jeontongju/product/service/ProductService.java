@@ -186,6 +186,9 @@ public class ProductService {
     }
     
     log.info("정상적인 데이터");
+    log.info(productInfoDtoList.toString());
+    log.info("수량 " + productInfoDtoList.get(0).getProductCount().toString() + "가격 " + productInfoDtoList.get(0).getProductPrice().toString());
+
 
     return productInfoDtoList;
   }
