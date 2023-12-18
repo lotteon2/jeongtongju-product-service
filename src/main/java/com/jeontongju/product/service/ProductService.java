@@ -85,8 +85,6 @@ public class ProductService {
                     .build())
             .productRecode(createProductRecode)
             .productRecodeAdditionalContents(createProductRecodeAdditionalContents)
-            .reviewCount(0L)
-            .totalSalesCount(0L)
             .action("INSERT")
             .build());
 
@@ -175,6 +173,7 @@ public class ProductService {
               .orElseThrow(ProductNotFoundException::new);
 
       if (productInfoDto.getProductCount() < orderedProduct.getProductCount()) {
+        log.error("재고 부족");
         throw new ProductOrderException("재고가 부족합니다.");
       }
       actualTotalPrice += productInfoDto.getProductPrice() * orderedProduct.getProductCount();
@@ -182,8 +181,11 @@ public class ProductService {
     }
 
     if (actualTotalPrice != productSearchDto.getTotalPrice()) {
+      log.error("총 가격 불일치");
       throw new ProductOrderException("총 가격이 일치하지 않습니다.");
     }
+    
+    log.info("정상적인 데이터");
 
     return productInfoDtoList;
   }
