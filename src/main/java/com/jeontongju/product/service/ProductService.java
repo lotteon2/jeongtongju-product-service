@@ -14,8 +14,8 @@ import com.jeontongju.product.dynamodb.domian.ProductRecordId;
 import com.jeontongju.product.dynamodb.repository.ProductRecordRepository;
 import com.jeontongju.product.exception.CategoryNotFoundException;
 import com.jeontongju.product.exception.ProductNotFoundException;
-import com.jeontongju.product.exception.ProductOrderException;
 import com.jeontongju.product.exception.StockException;
+import com.jeontongju.product.exception.common.CustomFailureFeignException;
 import com.jeontongju.product.kafka.ProductProducer;
 import com.jeontongju.product.mapper.ProductMapper;
 import com.jeontongju.product.repository.CategoryRepository;
@@ -28,6 +28,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import io.github.bitbox.bitbox.enums.FailureTypeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -175,22 +177,17 @@ public class ProductService {
       ProductInfoDto productInfoDto = productMapper.toProductInfoDto(product,orderedProduct);
 
       if (product.getStockQuantity() < orderedProduct.getProductCount()) {
-        log.error("재고 부족");
-        throw new ProductOrderException("재고가 부족합니다.");
+        log.error(FailureTypeEnum.LACK_OF_STOCK.getValue());
+        throw new CustomFailureFeignException(FailureTypeEnum.LACK_OF_STOCK);
       }
       actualTotalPrice += productInfoDto.getProductPrice() * orderedProduct.getProductCount();
       productInfoDtoList.add(productInfoDto);
     }
 
     if (actualTotalPrice != productSearchDto.getTotalPrice()) {
-      log.error("총 가격 불일치");
-      throw new ProductOrderException("총 가격이 일치하지 않습니다.");
+      log.error(FailureTypeEnum.MISMATCH_TOTAL_PRODUCT_AMOUNT.getValue());
+      throw new CustomFailureFeignException(FailureTypeEnum.MISMATCH_TOTAL_PRODUCT_AMOUNT);
     }
-    
-    log.info("정상적인 데이터");
-    log.info(productInfoDtoList.toString());
-    log.info("수량 " + productInfoDtoList.get(0).getProductCount().toString() + "가격 " + productInfoDtoList.get(0).getProductPrice().toString());
-
 
     return productInfoDtoList;
   }
