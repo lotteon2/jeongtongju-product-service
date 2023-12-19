@@ -169,11 +169,14 @@ public class ProductService {
     long actualTotalPrice = 0L;
     for (ProductUpdateDto orderedProduct : productSearchDto.getProductUpdateDtoList()) {
 
+      log.info("상품 " + orderedProduct.getProductId() );
+
       Product product =
               productRepository
                       .findByProductIdsForOrder(orderedProduct.getProductId())
                       .orElseThrow(ProductNotFoundException::new);
 
+      log.info("찾은 상품 " + product.getProductId());
       ProductInfoDto productInfoDto = productMapper.toProductInfoDto(product,orderedProduct);
 
       if (product.getStockQuantity() < orderedProduct.getProductCount()) {
