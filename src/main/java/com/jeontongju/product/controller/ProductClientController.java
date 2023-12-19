@@ -1,6 +1,5 @@
 package com.jeontongju.product.controller;
 
-
 import com.jeontongju.product.service.ProductService;
 import io.github.bitbox.bitbox.dto.FeignFormat;
 import io.github.bitbox.bitbox.dto.ProductInfoDto;
@@ -23,13 +22,20 @@ public class ProductClientController {
   ResponseEntity<FeignFormat<List<ProductInfoDto>>> getProductInfoForOrder(
       @RequestBody ProductSearchDto productSearchDto) {
 
-    log.info("-----테스트"  + productSearchDto.getTotalPrice());
-    log.info("----테스트"  + productSearchDto.getProductUpdateDtoList().toString());
-
     return ResponseEntity.ok(
         FeignFormat.<List<ProductInfoDto>>builder()
             .code(HttpStatus.OK.value())
             .data(productService.getProductInfoForOrder(productSearchDto))
+            .build());
+  }
+
+  @GetMapping("/products/{productId}/image")
+  ResponseEntity<FeignFormat<String>> getProductImage(@PathVariable String productId) {
+
+    return ResponseEntity.ok(
+        FeignFormat.<String>builder()
+            .code(HttpStatus.OK.value())
+            .data(productService.getProductImage(productId))
             .build());
   }
 }
