@@ -24,12 +24,11 @@ import io.github.bitbox.bitbox.dto.ProductInfoDto;
 import io.github.bitbox.bitbox.dto.ProductSearchDto;
 import io.github.bitbox.bitbox.dto.ProductUpdateDto;
 import io.github.bitbox.bitbox.dto.SellerInfoDto;
+import io.github.bitbox.bitbox.enums.FailureTypeEnum;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import io.github.bitbox.bitbox.enums.FailureTypeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -169,15 +168,12 @@ public class ProductService {
     long actualTotalPrice = 0L;
     for (ProductUpdateDto orderedProduct : productSearchDto.getProductUpdateDtoList()) {
 
-      log.info("상품 " + orderedProduct.getProductId() );
-
       Product product =
-              productRepository
-                      .findByProductIdsForOrder(orderedProduct.getProductId())
-                      .orElseThrow(ProductNotFoundException::new);
+          productRepository
+              .findByProductIdsForOrder(orderedProduct.getProductId())
+              .orElseThrow(ProductNotFoundException::new);
 
-      log.info("찾은 상품 " + product.getProductId());
-      ProductInfoDto productInfoDto = productMapper.toProductInfoDto(product,orderedProduct);
+      ProductInfoDto productInfoDto = productMapper.toProductInfoDto(product, orderedProduct);
 
       if (product.getStockQuantity() < orderedProduct.getProductCount()) {
         log.error(FailureTypeEnum.LACK_OF_STOCK.getValue());
@@ -222,5 +218,14 @@ public class ProductService {
       // 재고 복구
       product.setStockQuantity(product.getStockQuantity() + productUpdateDto.getProductCount());
     }
+  }
+
+  public String getProductImage(String productId) {
+
+    return productRepository
+        .findById(productId)
+        .orElseThrow(ProductNotFoundException::new)
+        .getProductThumbnailImage()
+        .getImageUrl();
   }
 }
