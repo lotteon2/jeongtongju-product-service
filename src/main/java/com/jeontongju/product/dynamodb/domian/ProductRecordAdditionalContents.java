@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ProductProductRecordAdditionalContents {
+public class ProductRecordAdditionalContents {
 
   private String productId;
 
@@ -24,10 +24,10 @@ public class ProductProductRecordAdditionalContents {
 
   private List<String> concept;
 
-  public static ProductProductRecordAdditionalContents toDto(
+  public static ProductRecordAdditionalContents toDto(
       String productId, ProductDto productRequestDto) {
 
-    return ProductProductRecordAdditionalContents.builder()
+    return ProductRecordAdditionalContents.builder()
         .productId(productId)
         .taste(productRequestDto.getTaste())
         .rawMaterial(productRequestDto.getRawMaterial())

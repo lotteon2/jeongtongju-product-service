@@ -7,12 +7,11 @@ import com.jeontongju.product.dto.request.ModifyProductInfoDto;
 import com.jeontongju.product.dto.request.ProductDto;
 import com.jeontongju.product.dto.response.CategoryDto;
 import com.jeontongju.product.dto.response.GetProductInfoDto;
-import com.jeontongju.product.dynamodb.domian.ProductProductRecordAdditionalContents;
-import com.jeontongju.product.dynamodb.domian.ProductRecord;
-import com.jeontongju.product.dynamodb.domian.ProductRecordContents;
-import com.jeontongju.product.dynamodb.domian.ProductRecordId;
+import com.jeontongju.product.dynamodb.domian.*;
+import com.jeontongju.product.dynamodb.repository.ProductMetricsRepository;
 import com.jeontongju.product.dynamodb.repository.ProductRecordRepository;
 import com.jeontongju.product.exception.CategoryNotFoundException;
+import com.jeontongju.product.exception.ProductMetricsNotFoundException;
 import com.jeontongju.product.exception.ProductNotFoundException;
 import com.jeontongju.product.exception.StockException;
 import com.jeontongju.product.exception.common.CustomFailureFeignException;
@@ -43,7 +42,8 @@ public class ProductService {
   private final CategoryRepository categoryRepository;
   private final ProductRepository productRepository;
   private final SellerServiceClient sellerServiceClient;
-  private final ProductRecordRepository productRecodeRepository;
+  private final ProductRecordRepository productRecordRepository;
+  private final ProductMetricsRepository productMetricsRepository;
   private final ProductMapper productMapper;
   private final ProductProducer productProducer;
 
@@ -71,26 +71,26 @@ public class ProductService {
             productMapper.toEntity(productDto, memberId, category, sellerInfoDto));
 
     // dynamoDB save
-    ProductRecordContents createProductRecode =
+    ProductRecordContents createProductRecord =
         ProductRecordContents.toDto(savedProduct.getProductId(), savedProduct, null);
 
-    ProductProductRecordAdditionalContents createProductRecodeAdditionalContents =
-        ProductProductRecordAdditionalContents.toDto(savedProduct.getProductId(), productDto);
+    ProductRecordAdditionalContents createproductRecordAdditionalContents =
+        ProductRecordAdditionalContents.toDto(savedProduct.getProductId(), productDto);
 
-    productRecodeRepository.save(
+    productRecordRepository.save(
         ProductRecord.builder()
-            .productRecodeId(
+            .productRecordId(
                 ProductRecordId.builder()
                     .productId(savedProduct.getProductId())
                     .createdAt(LocalDateTime.now().toString())
                     .build())
-            .productRecode(createProductRecode)
-            .productRecodeAdditionalContents(createProductRecodeAdditionalContents)
+            .productRecord(createProductRecord)
+            .productRecordAdditionalContents(createproductRecordAdditionalContents)
             .action("INSERT")
             .build());
 
     // kafka - search
-    productProducer.sendCreateProductToSearch(createProductRecode);
+    productProducer.sendCreateProductToSearch(createProductRecord);
 
     return savedProduct;
   }
@@ -114,26 +114,42 @@ public class ProductService {
   }
 
   @Transactional
+  public void deleteProductByDeleteSeller(Long memberId) {
+
+    List<Product> products = productRepository.findBySellerId(memberId);
+    List<String> productIds = new ArrayList<>();
+
+    products.forEach(
+            product -> {
+              product.setDeleted(true);
+              productIds.add(product.getProductId());
+            });
+    productProducer.sendDeleteProductToSearch(productIds);
+    productProducer.sendDeleteProductToWish(productIds);
+    productProducer.sendDeleteProductToReview(productIds);
+  }
+
+  @Transactional
   public void modifyProductByAdmin(String productId, Boolean isActivate) {
     Product product =
         productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
     product.setActivate(isActivate);
 
-    ProductRecordContents updateProductRecode =
+    ProductRecordContents updateProductRecord =
         ProductRecordContents.toDto(productId, product, null);
-    productRecodeRepository.save(
+    productRecordRepository.save(
         ProductRecord.builder()
-            .productRecodeId(
+            .productRecordId(
                 ProductRecordId.builder()
                     .productId(productId)
                     .createdAt(product.getUpdatedAt().toString())
                     .build())
-            .productRecode(updateProductRecode)
+            .productRecord(updateProductRecord)
             .action("UPDATE")
             .build());
 
     // kafka search
-    productProducer.sendUpdateProductToSearch(updateProductRecode);
+    productProducer.sendUpdateProductToSearch(updateProductRecord);
   }
 
   @Transactional
@@ -143,23 +159,46 @@ public class ProductService {
     product.modifyProduct(modifyProductInfoDto);
 
     // 변경 이력 - dynamo db
-    ProductRecordContents updateProductRecode =
+    ProductRecordContents updateProductRecord =
         ProductRecordContents.toDto(productId, product, null);
 
-    productRecodeRepository.save(
+    productRecordRepository.save(
         ProductRecord.builder()
-            .productRecodeId(
+            .productRecordId(
                 ProductRecordId.builder()
                     .productId(productId)
                     .createdAt(LocalDateTime.now().toString())
                     .build())
-            .productRecode(updateProductRecode)
+            .productRecord(updateProductRecord)
             .action("UPDATE")
             .build());
 
     // kafka review, search
-    productProducer.sendUpdateProductToSearch(updateProductRecode);
+    productProducer.sendUpdateProductToSearch(updateProductRecord);
     productProducer.sendUpdateProductToReview(modifyProductInfoDto.getProductThumbnailImageUrl());
+  }
+
+  @Transactional
+  public void modifyProductByModifySeller(SellerInfoDto sellerInfoDto) {
+
+    List<Product> products = productRepository.findBySellerId(sellerInfoDto.getSellerId());
+
+    for (Product product : products) {
+      product.modifyProductByModifySeller(sellerInfoDto);
+      ProductRecordContents updateProductRecord =
+          ProductRecordContents.toDto(product.getProductId(), product, null);
+
+      productRecordRepository.save(
+          ProductRecord.builder()
+              .productRecordId(
+                  ProductRecordId.builder()
+                      .productId(product.getProductId())
+                      .createdAt(LocalDateTime.now().toString())
+                      .build())
+              .productRecord(updateProductRecord)
+              .action("UPDATE")
+              .build());
+    }
   }
 
   public List<ProductInfoDto> getProductInfoForOrder(ProductSearchDto productSearchDto) {
@@ -220,6 +259,26 @@ public class ProductService {
     }
   }
 
+  @Transactional
+  public void updateProductSalesCountFromOrder(List<ProductUpdateDto> productUpdateDtoList) {
+    productUpdateDtoList.forEach(productUpdateDto -> {
+      ProductMetrics productMetrics = productMetricsRepository.findById(productUpdateDto.getProductId())
+              .orElseThrow(ProductMetricsNotFoundException::new);
+      productMetrics.setTotalSalesCount( productMetrics.getTotalSalesCount() + productUpdateDto.getProductCount());
+      productMetrics.setCreatedAt(LocalDateTime.now());
+    });
+  }
+
+  @Transactional
+  public void addStockFromCancelOrder(List<ProductUpdateDto> productUpdateDtoList) {
+    productUpdateDtoList.forEach(productUpdateDto -> {
+      ProductMetrics productMetrics = productMetricsRepository.findById(productUpdateDto.getProductId())
+              .orElseThrow(ProductMetricsNotFoundException::new);
+      productMetrics.setTotalSalesCount( productMetrics.getTotalSalesCount() - productUpdateDto.getProductCount());
+      productMetrics.setCreatedAt(LocalDateTime.now());
+    });
+    }
+
   public String getProductImage(String productId) {
 
     return productRepository
@@ -229,3 +288,4 @@ public class ProductService {
         .getImageUrl();
   }
 }
+

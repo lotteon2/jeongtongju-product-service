@@ -20,40 +20,40 @@ import lombok.NoArgsConstructor;
 @DynamoDBTable(tableName = "product_recode")
 public class ProductRecord {
 
-  @Id private ProductRecordId productRecodeId;
+  @Id private ProductRecordId productRecordId;
 
   @DynamoDBAttribute(attributeName = "product")
-  @DynamoDBTypeConverted(converter = DynamoDBConfig.ProductRecodeConverter.class)
-  private ProductRecordContents productRecode;
+  @DynamoDBTypeConverted(converter = DynamoDBConfig.productRecordConverter.class)
+  private ProductRecordContents productRecord;
 
   @DynamoDBAttribute(attributeName = "product_additional")
-  @DynamoDBTypeConverted(converter = DynamoDBConfig.ProductRecodeAdditionalConverter.class)
-  private ProductProductRecordAdditionalContents productRecodeAdditionalContents;
+  @DynamoDBTypeConverted(converter = DynamoDBConfig.productRecordAdditionalConverter.class)
+  private ProductRecordAdditionalContents productRecordAdditionalContents;
 
   @DynamoDBAttribute(attributeName = "action")
   private String action;
 
   @DynamoDBHashKey(attributeName = "product_id")
   public String getProductId() {
-    return productRecodeId != null ? productRecodeId.getProductId() : null;
+    return productRecordId != null ? productRecordId.getProductId() : null;
   }
 
   public void setProductId(String productId) {
-    if (productRecodeId == null) {
-      productRecodeId = new ProductRecordId();
+    if (productRecordId == null) {
+      productRecordId = new ProductRecordId();
     }
-    productRecodeId.setProductId(productId);
+    productRecordId.setProductId(productId);
   }
 
   @DynamoDBHashKey(attributeName = "created_at")
   public String getCreatedAt() {
-    return productRecodeId != null ? productRecodeId.getCreatedAt() : null;
+    return productRecordId != null ? productRecordId.getCreatedAt() : null;
   }
 
   public void setCreatedAt(String createdAt) {
-    if (productRecodeId == null) {
-      productRecodeId = new ProductRecordId();
+    if (productRecordId == null) {
+      productRecordId = new ProductRecordId();
     }
-    productRecodeId.setCreatedAt(createdAt);
+    productRecordId.setCreatedAt(createdAt);
   }
 }
