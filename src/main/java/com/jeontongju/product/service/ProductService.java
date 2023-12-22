@@ -19,10 +19,7 @@ import com.jeontongju.product.kafka.ProductProducer;
 import com.jeontongju.product.mapper.ProductMapper;
 import com.jeontongju.product.repository.CategoryRepository;
 import com.jeontongju.product.repository.ProductRepository;
-import io.github.bitbox.bitbox.dto.ProductInfoDto;
-import io.github.bitbox.bitbox.dto.ProductSearchDto;
-import io.github.bitbox.bitbox.dto.ProductUpdateDto;
-import io.github.bitbox.bitbox.dto.SellerInfoDto;
+import io.github.bitbox.bitbox.dto.*;
 import io.github.bitbox.bitbox.enums.FailureTypeEnum;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -120,10 +117,10 @@ public class ProductService {
     List<String> productIds = new ArrayList<>();
 
     products.forEach(
-            product -> {
-              product.setDeleted(true);
-              productIds.add(product.getProductId());
-            });
+        product -> {
+          product.setDeleted(true);
+          productIds.add(product.getProductId());
+        });
     productProducer.sendDeleteProductToSearch(productIds);
     productProducer.sendDeleteProductToWish(productIds);
     productProducer.sendDeleteProductToReview(productIds);
@@ -261,23 +258,31 @@ public class ProductService {
 
   @Transactional
   public void updateProductSalesCountFromOrder(List<ProductUpdateDto> productUpdateDtoList) {
-    productUpdateDtoList.forEach(productUpdateDto -> {
-      ProductMetrics productMetrics = productMetricsRepository.findById(productUpdateDto.getProductId())
-              .orElseThrow(ProductMetricsNotFoundException::new);
-      productMetrics.setTotalSalesCount( productMetrics.getTotalSalesCount() + productUpdateDto.getProductCount());
-      productMetrics.setCreatedAt(LocalDateTime.now());
-    });
+    productUpdateDtoList.forEach(
+        productUpdateDto -> {
+          ProductMetrics productMetrics =
+              productMetricsRepository
+                  .findById(productUpdateDto.getProductId())
+                  .orElseThrow(ProductMetricsNotFoundException::new);
+          productMetrics.setTotalSalesCount(
+              productMetrics.getTotalSalesCount() + productUpdateDto.getProductCount());
+          productMetrics.setCreatedAt(LocalDateTime.now());
+        });
   }
 
   @Transactional
   public void addStockFromCancelOrder(List<ProductUpdateDto> productUpdateDtoList) {
-    productUpdateDtoList.forEach(productUpdateDto -> {
-      ProductMetrics productMetrics = productMetricsRepository.findById(productUpdateDto.getProductId())
-              .orElseThrow(ProductMetricsNotFoundException::new);
-      productMetrics.setTotalSalesCount( productMetrics.getTotalSalesCount() - productUpdateDto.getProductCount());
-      productMetrics.setCreatedAt(LocalDateTime.now());
-    });
-    }
+    productUpdateDtoList.forEach(
+        productUpdateDto -> {
+          ProductMetrics productMetrics =
+              productMetricsRepository
+                  .findById(productUpdateDto.getProductId())
+                  .orElseThrow(ProductMetricsNotFoundException::new);
+          productMetrics.setTotalSalesCount(
+              productMetrics.getTotalSalesCount() - productUpdateDto.getProductCount());
+          productMetrics.setCreatedAt(LocalDateTime.now());
+        });
+  }
 
   public String getProductImage(String productId) {
 
@@ -287,5 +292,14 @@ public class ProductService {
         .getProductThumbnailImage()
         .getImageUrl();
   }
-}
 
+  public List<ProductWishInfoDto> getProductInfoForWish(ProductIdListDto productIdList) {
+
+    return productIdList.getProductIdList().stream()
+        .map(
+            id ->
+                productMapper.toProductWishInfoDto(
+                    productRepository.findById(id).orElseThrow(ProductNotFoundException::new)))
+        .collect(Collectors.toList());
+  }
+}
