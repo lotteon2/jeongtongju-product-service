@@ -15,16 +15,16 @@ public class ProductProducer<T> {
     kafkaTemplate.send(KafkaTopicNameInfo.CREATE_PRODUCT_TO_SEARCH, createProductRecode);
   }
 
-  public void sendDeleteProductToSearch(T productId) {
-    kafkaTemplate.send(KafkaTopicNameInfo.DELETE_PRODUCT_TO_SEARCH, productId);
+  public void sendDeleteProductToSearch(T productIds) {
+    kafkaTemplate.send(KafkaTopicNameInfo.DELETE_PRODUCT_TO_SEARCH, productIds);
   }
 
-  public void sendDeleteProductToWish(T productId) {
-    kafkaTemplate.send(KafkaTopicNameInfo.DELETE_PRODUCT_TO_WISH_CART, productId);
+  public void sendDeleteProductToWish(T productIds) {
+    kafkaTemplate.send(KafkaTopicNameInfo.DELETE_PRODUCT_TO_WISH_CART, productIds);
   }
 
-  public void sendDeleteProductToReview(T productId) {
-    kafkaTemplate.send(KafkaTopicNameInfo.DELETE_PRODUCT_TO_REVIEW, productId);
+  public void sendDeleteProductToReview(T productIds) {
+    kafkaTemplate.send(KafkaTopicNameInfo.DELETE_PRODUCT_TO_REVIEW, productIds);
   }
 
   public void sendUpdateProductToSearch(T updateProductRecode) {

@@ -2,11 +2,11 @@ package com.jeontongju.product.domain;
 
 import com.jeontongju.product.domain.common.BaseEntity;
 import com.jeontongju.product.dto.request.ModifyProductInfoDto;
+import io.github.bitbox.bitbox.dto.SellerInfoDto;
+import java.time.LocalDateTime;
 import javax.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
-
-import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -126,6 +126,18 @@ public class Product extends BaseEntity {
     }
   }
 
+  public void setStoreImageUrl(String storeImageUrl) {
+    if (storeImageUrl != null) {
+      this.storeImageUrl = storeImageUrl;
+    }
+  }
+
+  public void setStoreName(String storeName) {
+    if (storeName != null) {
+      this.storeName = storeName;
+    }
+  }
+
   public void setDeleted(Boolean deleted) {
     this.isDeleted = deleted;
   }
@@ -138,6 +150,12 @@ public class Product extends BaseEntity {
     setStockQuantity(modifyProductInfoDto.getRegisteredQuantity());
     setActivate(modifyProductInfoDto.getIsActivate());
   }
+
+  public void modifyProductByModifySeller(SellerInfoDto sellerInfoDto) {
+    setStoreName(sellerInfoDto.getStoreName());
+    setStoreImageUrl(sellerInfoDto.getStoreImageUrl());
+  }
+
   @PreUpdate
   public void beforeAnyUpdate() {
     this.setUpdatedAt(LocalDateTime.now());

@@ -21,12 +21,12 @@ public class ProductConsumer {
 
   @KafkaListener(topics = KafkaTopicNameInfo.DELETE_SELLER_TO_PRODUCT)
   public void deleteProductFromSeller(Long sellerId) {
-    // 탈퇴 시키기
+    productService.deleteProductByDeleteSeller(sellerId);
   }
 
   @KafkaListener(topics = KafkaTopicNameInfo.UPDATE_SELLER_TO_PRODUCT)
   public void updateProductFromSeller(SellerInfoDto sellerInfoDto) {
-    // 수정 시키기
+    productService.modifyProductByModifySeller(sellerInfoDto);
   }
 
   @KafkaListener(topics = KafkaTopicNameInfo.REDUCE_STOCK)
@@ -59,13 +59,13 @@ public class ProductConsumer {
 
   @KafkaListener(topics = KafkaTopicNameInfo.UPDATE_PRODUCT_SALES_COUNT)
   public void updateProductSalesCountFromOrder(List<ProductUpdateDto> productUpdateDtoList) {
-    // TODO 주문 확정으로 상품 판매 개수 증가
+    productService.updateProductSalesCountFromOrder(productUpdateDtoList);
   }
 
   @KafkaListener(topics = KafkaTopicNameInfo.CANCEL_ORDER_STOCK)
   public void addStockFromCancelOrder(List<ProductUpdateDto> productUpdateDtoList) {
     productService.rollbackStock(productUpdateDtoList);
-    // TODO 상품 판매 개수 차감
+    productService.addStockFromCancelOrder(productUpdateDtoList);
   }
 
   public void sendOrderInfoDto(OrderInfoDto orderInfoDto) {
