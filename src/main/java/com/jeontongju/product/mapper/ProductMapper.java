@@ -5,10 +5,7 @@ import com.jeontongju.product.domain.Product;
 import com.jeontongju.product.domain.ProductDetailsImage;
 import com.jeontongju.product.domain.ProductThumbnailImage;
 import com.jeontongju.product.dto.request.ProductDto;
-import io.github.bitbox.bitbox.dto.ProductInfoDto;
-import io.github.bitbox.bitbox.dto.ProductSearchDto;
-import io.github.bitbox.bitbox.dto.ProductUpdateDto;
-import io.github.bitbox.bitbox.dto.SellerInfoDto;
+import io.github.bitbox.bitbox.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,18 +15,20 @@ public class ProductMapper {
   public Product toEntity(
       ProductDto productDto, Long sellerId, Category category, SellerInfoDto sellerInfoDto) {
 
-    ProductThumbnailImage productThumbnailImage = ProductThumbnailImage.builder()
-            .imageUrl(productDto.getProductThumbnailImageUrl())
-            .build();
-    ProductDetailsImage productDetailsImage = ProductDetailsImage.builder().imageUrl(productDto.getProductDetailsImageUrl()).build();
-    Product product = Product.builder()
+    ProductThumbnailImage productThumbnailImage =
+        ProductThumbnailImage.builder().imageUrl(productDto.getProductThumbnailImageUrl()).build();
+    ProductDetailsImage productDetailsImage =
+        ProductDetailsImage.builder().imageUrl(productDto.getProductDetailsImageUrl()).build();
+    Product product =
+        Product.builder()
             .category(category)
             .sellerId(sellerId)
             .name(productDto.getProductName())
             .price(productDto.getProductPrice())
             .capacityToPriceRatio(
-                    Math.round(
-                            ((double) productDto.getProductPrice() / productDto.getProductCapacity()) * 100))
+                Math.round(
+                    ((double) productDto.getProductPrice() / productDto.getProductCapacity())
+                        * 100))
             .description(productDto.getProductDescription())
             .alcoholDegree(productDto.getProductAlcoholDegree())
             .capacity(productDto.getProductCapacity())
@@ -39,10 +38,8 @@ public class ProductMapper {
             .breweryAddressDetails(productDto.getBreweryAddressDetails())
             .manufacturer(productDto.getManufacturer())
             .stockQuantity(productDto.getRegisteredQuantity())
-            .productThumbnailImage(
-                    productThumbnailImage)
-            .productDetailsImage(
-                    productDetailsImage)
+            .productThumbnailImage(productThumbnailImage)
+            .productDetailsImage(productDetailsImage)
             .storeName(sellerInfoDto.getStoreName())
             .storeImageUrl(sellerInfoDto.getStoreImageUrl())
             .build();
@@ -56,13 +53,25 @@ public class ProductMapper {
   public ProductInfoDto toProductInfoDto(Product product, ProductUpdateDto productUpdateDto) {
 
     return ProductInfoDto.builder()
-            .productId(product.getProductId())
-            .productName(product.getName())
-            .productPrice(product.getPrice())
-            .productCount(productUpdateDto.getProductCount())
-            .sellerId(product.getSellerId())
-            .sellerName(product.getStoreName())
-            .productImg(product.getProductThumbnailImage().getImageUrl())
-            .build();
+        .productId(product.getProductId())
+        .productName(product.getName())
+        .productPrice(product.getPrice())
+        .productCount(productUpdateDto.getProductCount())
+        .sellerId(product.getSellerId())
+        .sellerName(product.getStoreName())
+        .productImg(product.getProductThumbnailImage().getImageUrl())
+        .build();
+  }
+
+  public ProductWishInfoDto toProductWishInfoDto(Product product) {
+
+    return ProductWishInfoDto.builder()
+        .productId(product.getProductId())
+        .productName(product.getName())
+        .productPrice(product.getPrice())
+        .productThumbnailImage(product.getProductThumbnailImage().getImageUrl())
+        .stockQuantity(product.getStockQuantity())
+        .isActivate(product.getIsActivate())
+        .build();
   }
 }

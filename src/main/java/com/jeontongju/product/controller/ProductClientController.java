@@ -1,9 +1,7 @@
 package com.jeontongju.product.controller;
 
 import com.jeontongju.product.service.ProductService;
-import io.github.bitbox.bitbox.dto.FeignFormat;
-import io.github.bitbox.bitbox.dto.ProductInfoDto;
-import io.github.bitbox.bitbox.dto.ProductSearchDto;
+import io.github.bitbox.bitbox.dto.*;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +34,17 @@ public class ProductClientController {
         FeignFormat.<String>builder()
             .code(HttpStatus.OK.value())
             .data(productService.getProductImage(productId))
+            .build());
+  }
+
+  @PostMapping("/wish-cart")
+  ResponseEntity<FeignFormat<List<ProductWishInfoDto>>> getProductImage(
+      @RequestBody ProductIdListDto productIdList) {
+
+    return ResponseEntity.ok(
+        FeignFormat.<List<ProductWishInfoDto>>builder()
+            .code(HttpStatus.OK.value())
+            .data(productService.getProductInfoForWish(productIdList))
             .build());
   }
 }
