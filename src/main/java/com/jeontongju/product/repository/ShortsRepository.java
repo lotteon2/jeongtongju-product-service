@@ -9,4 +9,5 @@ public interface ShortsRepository extends JpaRepository<Shorts, Long> {
 
     Page<Shorts> findShortsByIsDeletedAndIsActivate(boolean isDeleted, boolean isActivate, Pageable pageable);
     Page<Shorts> findShortsBySellerIdAndIsDeletedAndIsActivate(Long sellerId, boolean isDeleted, boolean isActivate, Pageable pageable);
+    Page<Shorts> findShortsBySellerId(Long sellerId, Pageable pageable);
 }
