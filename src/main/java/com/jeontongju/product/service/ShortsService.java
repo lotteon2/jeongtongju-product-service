@@ -65,4 +65,9 @@ public class ShortsService {
         .orElseThrow(ShortsNotFoundException::new)
         .modifyShorts(updateShortsDto);
   }
+
+  @Transactional
+  public void deleteShorts(Long shortsId) {
+    shortsRepository.findById(shortsId).orElseThrow(ShortsNotFoundException::new).setDeleted(true);
+  }
 }

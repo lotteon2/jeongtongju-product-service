@@ -122,4 +122,21 @@ public class ShortsRestController {
                             .detail("쇼츠 수정 성공")
                             .build());
   }
+
+  @DeleteMapping("/shorts/{shortsId}")
+  public ResponseEntity<ResponseFormat<Void>> deleteShorts(
+          @RequestHeader Long memberId,
+          @RequestHeader MemberRoleEnum memberRole,
+          @PathVariable Long shortsId) {
+
+    shortsService.deleteShorts(shortsId);
+
+    return ResponseEntity.ok()
+            .body(
+                    ResponseFormat.<Void>builder()
+                            .code(HttpStatus.OK.value())
+                            .message(HttpStatus.OK.name())
+                            .detail("쇼츠 삭제 성공")
+                            .build());
+  }
 }
