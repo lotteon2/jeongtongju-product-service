@@ -1,23 +1,22 @@
 package com.jeontongju.product.controller;
 
-import com.jeontongju.product.dto.request.UpdateShortsDto;
 import com.jeontongju.product.dto.request.CreateShortsDto;
+import com.jeontongju.product.dto.request.UpdateShortsDto;
 import com.jeontongju.product.dto.response.GetShortsByConsumerDto;
 import com.jeontongju.product.dto.response.GetShortsBySellerDto;
 import com.jeontongju.product.dto.response.GetShortsDetailsDto;
 import com.jeontongju.product.service.ShortsService;
 import io.github.bitbox.bitbox.dto.ResponseFormat;
 import io.github.bitbox.bitbox.enums.MemberRoleEnum;
-import java.util.List;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 
 @RequestMapping("/api")
 @RestController
@@ -27,13 +26,13 @@ public class ShortsRestController {
   private final ShortsService shortsService;
 
   @GetMapping("/shorts")
-  public ResponseEntity<ResponseFormat<List<GetShortsByConsumerDto>>> getMainShorts(
+  public ResponseEntity<ResponseFormat<Page<GetShortsByConsumerDto>>> getMainShorts(
       @PageableDefault(page = 0, sort = "shortsHits", direction = Sort.Direction.DESC, size = 6)
           Pageable pageable) {
 
     return ResponseEntity.ok()
         .body(
-            ResponseFormat.<List<GetShortsByConsumerDto>>builder()
+            ResponseFormat.<Page<GetShortsByConsumerDto>>builder()
                 .code(HttpStatus.OK.value())
                 .message(HttpStatus.OK.name())
                 .detail("쇼츠 목록 조회 성공")
@@ -42,14 +41,14 @@ public class ShortsRestController {
   }
 
   @GetMapping("/sellers/{sellerId}/shorts")
-  public ResponseEntity<ResponseFormat<List<GetShortsByConsumerDto>>> getOneSellerShorts(
+  public ResponseEntity<ResponseFormat<Page<GetShortsByConsumerDto>>> getOneSellerShorts(
       @PathVariable Long sellerId,
       @PageableDefault(page = 0, sort = "shortsHits", direction = Sort.Direction.DESC, size = 5)
           Pageable pageable) {
 
     return ResponseEntity.ok()
         .body(
-            ResponseFormat.<List<GetShortsByConsumerDto>>builder()
+            ResponseFormat.<Page<GetShortsByConsumerDto>>builder()
                 .code(HttpStatus.OK.value())
                 .message(HttpStatus.OK.name())
                 .detail("셀러 소개 - 쇼츠 목록 조회 성공")
@@ -72,7 +71,7 @@ public class ShortsRestController {
   }
 
   @GetMapping("/sellers/shorts")
-  public ResponseEntity<ResponseFormat<List<GetShortsBySellerDto>>> getShortsBySeller(
+  public ResponseEntity<ResponseFormat<Page<GetShortsBySellerDto>>> getShortsBySeller(
       @RequestHeader Long memberId,
       @RequestHeader MemberRoleEnum memberRole,
       @PageableDefault(page = 0, sort = "createdAt", direction = Sort.Direction.DESC, size = 10)
@@ -80,7 +79,7 @@ public class ShortsRestController {
 
     return ResponseEntity.ok()
         .body(
-            ResponseFormat.<List<GetShortsBySellerDto>>builder()
+            ResponseFormat.<Page<GetShortsBySellerDto>>builder()
                 .code(HttpStatus.OK.value())
                 .message(HttpStatus.OK.name())
                 .detail("쇼츠 목록 성공")
