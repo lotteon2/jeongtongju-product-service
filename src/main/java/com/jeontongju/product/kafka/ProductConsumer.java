@@ -3,6 +3,7 @@ package com.jeontongju.product.kafka;
 import com.jeontongju.product.service.ProductService;
 import io.github.bitbox.bitbox.dto.OrderInfoDto;
 import io.github.bitbox.bitbox.dto.ProductUpdateDto;
+import io.github.bitbox.bitbox.dto.ProductUpdateListDto;
 import io.github.bitbox.bitbox.dto.SellerInfoDto;
 import io.github.bitbox.bitbox.util.KafkaTopicNameInfo;
 import java.util.List;
@@ -58,14 +59,14 @@ public class ProductConsumer {
   }
 
   @KafkaListener(topics = KafkaTopicNameInfo.UPDATE_PRODUCT_SALES_COUNT)
-  public void updateProductSalesCountFromOrder(List<ProductUpdateDto> productUpdateDtoList) {
-    productService.updateProductSalesCountFromOrder(productUpdateDtoList);
+  public void updateProductSalesCountFromOrder(ProductUpdateListDto productUpdateDtoList) {
+    productService.updateProductSalesCountFromOrder(productUpdateDtoList.getProductUpdateDtoList());
   }
 
   @KafkaListener(topics = KafkaTopicNameInfo.CANCEL_ORDER_STOCK)
-  public void addStockFromCancelOrder(List<ProductUpdateDto> productUpdateDtoList) {
-    productService.rollbackStock(productUpdateDtoList);
-    productService.addStockFromCancelOrder(productUpdateDtoList);
+  public void addStockFromCancelOrder(ProductUpdateListDto productUpdateDtoList) {
+    productService.rollbackStock(productUpdateDtoList.getProductUpdateDtoList());
+    productService.addStockFromCancelOrder(productUpdateDtoList.getProductUpdateDtoList());
   }
 
   public void sendOrderInfoDto(OrderInfoDto orderInfoDto) {
