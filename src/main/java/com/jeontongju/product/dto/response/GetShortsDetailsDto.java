@@ -1,6 +1,7 @@
 package com.jeontongju.product.dto.response;
 
 import com.jeontongju.product.domain.Shorts;
+import com.jeontongju.product.enums.ShortsTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,10 +21,11 @@ public class GetShortsDetailsDto {
     private String targetId;
 
     public static GetShortsDetailsDto toDto(Shorts shorts) {
-        String targetId;
-        if (shorts.getProductId() != null) {
+        String targetId = "";
+        if (shorts.getType() != ShortsTypeEnum.PRODUCT
+        ) {
             targetId = "product/" + shorts.getProductId();
-        } else {
+        } else if (shorts.getType() != ShortsTypeEnum.SELLER) {
             targetId = "seller/" + shorts.getSellerId();
         }
 
