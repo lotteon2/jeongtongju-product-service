@@ -1,5 +1,6 @@
 package com.jeontongju.product.controller;
 
+import com.jeontongju.product.dto.request.CreateShortsDto;
 import com.jeontongju.product.dto.response.GetShortsByConsumerDto;
 import com.jeontongju.product.dto.response.GetShortsBySellerDto;
 import com.jeontongju.product.dto.response.GetShortsDetailsDto;
@@ -14,6 +15,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RequestMapping("/api")
 @RestController
@@ -81,6 +84,23 @@ public class ShortsRestController {
                 .message(HttpStatus.OK.name())
                 .detail("쇼츠 목록 성공")
                 .data(shortsService.getShortsBySeller(memberId, pageable))
+                .build());
+  }
+
+  @PostMapping("/shorts")
+  public ResponseEntity<ResponseFormat<Void>> createShorts(
+      @RequestHeader Long memberId,
+      @RequestHeader MemberRoleEnum memberRole,
+      @Valid @RequestBody CreateShortsDto createShortsDto) {
+
+    shortsService.createShorts(memberId, createShortsDto);
+
+    return ResponseEntity.ok()
+        .body(
+            ResponseFormat.<Void>builder()
+                .code(HttpStatus.OK.value())
+                .message(HttpStatus.OK.name())
+                .detail("쇼츠 등록 성공")
                 .build());
   }
 }
