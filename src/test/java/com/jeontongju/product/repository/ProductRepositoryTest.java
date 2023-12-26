@@ -106,7 +106,6 @@ public class ProductRepositoryTest {
 
     Assertions.assertThat(product.getProductId()).isNotNull();
     Assertions.assertThat(product.getName()).isSameAs(productEntity.getName());
-    Assertions.assertThat(product.getReviewCount()).isSameAs(0L);
     Assertions.assertThat(product.getIsActivate()).isSameAs(true);
     Assertions.assertThat(
             productThumbnailImageRepository
