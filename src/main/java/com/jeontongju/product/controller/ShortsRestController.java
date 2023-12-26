@@ -1,6 +1,7 @@
 package com.jeontongju.product.controller;
 
 import com.jeontongju.product.dto.response.GetShortsByConsumerDto;
+import com.jeontongju.product.dto.response.GetShortsDetailsDto;
 import com.jeontongju.product.service.ShortsService;
 import io.github.bitbox.bitbox.dto.ResponseFormat;
 import java.util.List;
@@ -50,6 +51,20 @@ public class ShortsRestController {
                             .message(HttpStatus.OK.name())
                             .detail("셀러 소개 - 쇼츠 목록 조회 성공")
                             .data(shortsService.getOneSellerShorts(sellerId, pageable))
+                            .build());
+  }
+
+  @GetMapping("/shorts/{shortsId}")
+  public ResponseEntity<ResponseFormat<GetShortsDetailsDto>> getOneSellerShorts(
+          @PathVariable Long shortsId) {
+
+    return ResponseEntity.ok()
+            .body(
+                    ResponseFormat.<GetShortsDetailsDto>builder()
+                            .code(HttpStatus.OK.value())
+                            .message(HttpStatus.OK.name())
+                            .detail("쇼츠 상세 조회 성공")
+                            .data(shortsService.getShortsDetails(shortsId))
                             .build());
   }
 }
