@@ -21,7 +21,7 @@ public class Shorts extends BaseEntity {
     @Column(name = "shorts_id")
     private Long shortsId;
 
-    @Column(name = "seller_id", unique = true, nullable = false)
+    @Column(name = "seller_id", nullable = false)
     private Long sellerId;
 
     @Column(name = "product_id", columnDefinition = "CHAR(36)")
@@ -29,6 +29,9 @@ public class Shorts extends BaseEntity {
 
     @Column(name = "video", nullable = false)
     private String video;
+
+    @Column(name = "preview", nullable = false)
+    private String preview;
 
     @Column(name = "thumbnail", nullable = false)
     private String thumbnail;
@@ -44,8 +47,8 @@ public class Shorts extends BaseEntity {
     private ShortsTypeEnum type;
 
     @Builder.Default
-    @Column(name = "hits", nullable = false)
-    private Long hits = 0L;
+    @Column(name = "shortsHits", nullable = false)
+    private Long shortsHits = 0L;
 
     @Builder.Default
     @Column(name = "is_activate", nullable = false)
