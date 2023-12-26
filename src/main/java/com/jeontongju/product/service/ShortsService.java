@@ -1,6 +1,7 @@
 package com.jeontongju.product.service;
 
 import com.jeontongju.product.dto.response.GetShortsByConsumerDto;
+import com.jeontongju.product.dto.response.GetShortsBySellerDto;
 import com.jeontongju.product.dto.response.GetShortsDetailsDto;
 import com.jeontongju.product.exception.ShortsNotFoundException;
 import com.jeontongju.product.repository.ShortsRepository;
@@ -38,5 +39,12 @@ public class ShortsService {
 
     return GetShortsDetailsDto.toDto(
         shortsRepository.findById(shortsId).orElseThrow(ShortsNotFoundException::new));
+  }
+
+  public List<GetShortsBySellerDto> getShortsBySeller(Long sellerId, Pageable pageable) {
+
+    return shortsRepository.findShortsBySellerId(sellerId, pageable).stream()
+        .map(shorts -> GetShortsBySellerDto.toDto(shorts))
+        .collect(Collectors.toList());
   }
 }
