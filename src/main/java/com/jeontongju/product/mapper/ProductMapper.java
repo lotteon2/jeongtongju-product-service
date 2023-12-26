@@ -1,10 +1,9 @@
 package com.jeontongju.product.mapper;
 
-import com.jeontongju.product.domain.Category;
-import com.jeontongju.product.domain.Product;
-import com.jeontongju.product.domain.ProductDetailsImage;
-import com.jeontongju.product.domain.ProductThumbnailImage;
+import com.jeontongju.product.domain.*;
+import com.jeontongju.product.dto.request.CreateShortsDto;
 import com.jeontongju.product.dto.request.ProductDto;
+import com.jeontongju.product.enums.ShortsTypeEnum;
 import io.github.bitbox.bitbox.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -12,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class ProductMapper {
-  public Product toEntity(
+  public Product toProductEntity(
       ProductDto productDto, Long sellerId, Category category, SellerInfoDto sellerInfoDto) {
 
     ProductThumbnailImage productThumbnailImage =
@@ -48,6 +47,18 @@ public class ProductMapper {
     productDetailsImage.setProduct(product);
 
     return product;
+  }
+
+  public Shorts toShortsEntity(Long sellerId, CreateShortsDto createShortsDto) {
+    return Shorts.builder()
+            .sellerId(sellerId)
+            .video(createShortsDto.getShortsVideoUrl())
+            .preview(createShortsDto.getShortsPreviewUrl())
+            .thumbnail(createShortsDto.getShortsThumbnailUrl())
+            .title(createShortsDto.getShortsTitle())
+            .description(createShortsDto.getShortsDescription())
+            .type(createShortsDto.getProductId() == null ? ShortsTypeEnum.SELLER : ShortsTypeEnum.PRODUCT)
+            .build();
   }
 
   public ProductInfoDto toProductInfoDto(Product product, ProductUpdateDto productUpdateDto) {

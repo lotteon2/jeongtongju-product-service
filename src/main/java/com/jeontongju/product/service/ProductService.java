@@ -65,7 +65,7 @@ public class ProductService {
     // rdb save
     Product savedProduct =
         productRepository.save(
-            productMapper.toEntity(productDto, memberId, category, sellerInfoDto));
+            productMapper.toProductEntity(productDto, memberId, category, sellerInfoDto));
 
     // dynamoDB save
     ProductRecordContents createProductRecord =

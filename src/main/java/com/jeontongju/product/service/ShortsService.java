@@ -1,9 +1,11 @@
 package com.jeontongju.product.service;
 
+import com.jeontongju.product.dto.request.CreateShortsDto;
 import com.jeontongju.product.dto.response.GetShortsByConsumerDto;
 import com.jeontongju.product.dto.response.GetShortsBySellerDto;
 import com.jeontongju.product.dto.response.GetShortsDetailsDto;
 import com.jeontongju.product.exception.ShortsNotFoundException;
+import com.jeontongju.product.mapper.ProductMapper;
 import com.jeontongju.product.repository.ShortsRepository;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ShortsService {
 
   private final ShortsRepository shortsRepository;
+  private final ProductMapper productMapper;
 
   public List<GetShortsByConsumerDto> getMainShorts(Pageable pageable) {
     return shortsRepository.findShortsByIsDeletedAndIsActivate(false, true, pageable).stream()
@@ -46,5 +49,10 @@ public class ShortsService {
     return shortsRepository.findShortsBySellerId(sellerId, pageable).stream()
         .map(shorts -> GetShortsBySellerDto.toDto(shorts))
         .collect(Collectors.toList());
+  }
+
+  @Transactional
+  public void createShorts(Long memberId, CreateShortsDto createShortsDto) {
+    shortsRepository.save(productMapper.toShortsEntity(memberId, createShortsDto));
   }
 }
