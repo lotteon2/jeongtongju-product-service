@@ -57,6 +57,7 @@ public class ProductMapper {
             .thumbnail(createShortsDto.getShortsThumbnailUrl())
             .title(createShortsDto.getShortsTitle())
             .description(createShortsDto.getShortsDescription())
+            .productId(createShortsDto.getProductId())
             .type(createShortsDto.getProductId() == null ? ShortsTypeEnum.SELLER : ShortsTypeEnum.PRODUCT)
             .build();
   }

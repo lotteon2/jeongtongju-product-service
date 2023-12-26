@@ -1,6 +1,7 @@
 package com.jeontongju.product.service;
 
 import com.jeontongju.product.dto.request.CreateShortsDto;
+import com.jeontongju.product.dto.request.UpdateShortsDto;
 import com.jeontongju.product.dto.response.GetShortsByConsumerDto;
 import com.jeontongju.product.dto.response.GetShortsBySellerDto;
 import com.jeontongju.product.dto.response.GetShortsDetailsDto;
@@ -54,5 +55,14 @@ public class ShortsService {
   @Transactional
   public void createShorts(Long memberId, CreateShortsDto createShortsDto) {
     shortsRepository.save(productMapper.toShortsEntity(memberId, createShortsDto));
+  }
+
+  @Transactional
+  public void updateShorts(Long shortsId, UpdateShortsDto updateShortsDto) {
+
+    shortsRepository
+        .findById(shortsId)
+        .orElseThrow(ShortsNotFoundException::new)
+        .modifyShorts(updateShortsDto);
   }
 }

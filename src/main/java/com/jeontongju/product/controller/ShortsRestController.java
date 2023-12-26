@@ -1,5 +1,6 @@
 package com.jeontongju.product.controller;
 
+import com.jeontongju.product.dto.request.UpdateShortsDto;
 import com.jeontongju.product.dto.request.CreateShortsDto;
 import com.jeontongju.product.dto.response.GetShortsByConsumerDto;
 import com.jeontongju.product.dto.response.GetShortsBySellerDto;
@@ -102,5 +103,23 @@ public class ShortsRestController {
                 .message(HttpStatus.OK.name())
                 .detail("쇼츠 등록 성공")
                 .build());
+  }
+
+  @PatchMapping("/sellers/shorts/{shortsId}")
+  public ResponseEntity<ResponseFormat<Void>> updateShorts(
+          @RequestHeader Long memberId,
+          @RequestHeader MemberRoleEnum memberRole,
+          @PathVariable Long shortsId,
+          @Valid @RequestBody UpdateShortsDto updateShortsDto) {
+
+    shortsService.updateShorts(shortsId, updateShortsDto);
+
+    return ResponseEntity.ok()
+            .body(
+                    ResponseFormat.<Void>builder()
+                            .code(HttpStatus.OK.value())
+                            .message(HttpStatus.OK.name())
+                            .detail("쇼츠 수정 성공")
+                            .build());
   }
 }
