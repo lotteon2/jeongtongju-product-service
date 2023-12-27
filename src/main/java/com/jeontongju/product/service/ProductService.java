@@ -11,7 +11,6 @@ import com.jeontongju.product.dynamodb.domian.*;
 import com.jeontongju.product.dynamodb.repository.ProductMetricsRepository;
 import com.jeontongju.product.dynamodb.repository.ProductRecordRepository;
 import com.jeontongju.product.exception.CategoryNotFoundException;
-import com.jeontongju.product.exception.ProductMetricsNotFoundException;
 import com.jeontongju.product.exception.ProductNotFoundException;
 import com.jeontongju.product.exception.StockException;
 import com.jeontongju.product.exception.common.CustomFailureFeignException;
@@ -21,13 +20,12 @@ import com.jeontongju.product.repository.CategoryRepository;
 import com.jeontongju.product.repository.ProductRepository;
 import io.github.bitbox.bitbox.dto.*;
 import io.github.bitbox.bitbox.enums.FailureTypeEnum;
+import io.github.bitbox.bitbox.enums.NotificationTypeEnum;
+import io.github.bitbox.bitbox.enums.RecipientTypeEnum;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import io.github.bitbox.bitbox.enums.NotificationTypeEnum;
-import io.github.bitbox.bitbox.enums.RecipientTypeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -265,26 +263,42 @@ public class ProductService {
     productUpdateDtoList.forEach(
         productUpdateDto -> {
           ProductMetrics productMetrics =
-              productMetricsRepository
-                  .findById(productUpdateDto.getProductId())
-                  .orElseThrow(ProductMetricsNotFoundException::new);
-          productMetrics.setTotalSalesCount(
-              productMetrics.getTotalSalesCount() + productUpdateDto.getProductCount());
-          productMetrics.setCreatedAt(LocalDateTime.now());
+              productMetricsRepository.findById(productUpdateDto.getProductId()).get();
+          if (productMetrics != null) {
+            productMetricsRepository.save(
+                ProductMetrics.builder()
+                    .productId(productUpdateDto.getProductId())
+                    .reviewCount(productMetrics.getReviewCount())
+                    .totalSalesCount(
+                        productMetrics.getTotalSalesCount() + productUpdateDto.getProductCount())
+                    .build());
+          } else {
+            productMetricsRepository.save(
+                ProductMetrics.builder()
+                    .productId(productUpdateDto.getProductId())
+                    .reviewCount(0L)
+                    .totalSalesCount(0L)
+                    .build());
+          }
         });
   }
 
   @Transactional
   public void addStockFromCancelOrder(List<ProductUpdateDto> productUpdateDtoList) {
+
     productUpdateDtoList.forEach(
         productUpdateDto -> {
           ProductMetrics productMetrics =
-              productMetricsRepository
-                  .findById(productUpdateDto.getProductId())
-                  .orElseThrow(ProductMetricsNotFoundException::new);
-          productMetrics.setTotalSalesCount(
-              productMetrics.getTotalSalesCount() - productUpdateDto.getProductCount());
-          productMetrics.setCreatedAt(LocalDateTime.now());
+              productMetricsRepository.findById(productUpdateDto.getProductId()).get();
+          if (productMetrics != null) {
+            productMetricsRepository.save(
+                ProductMetrics.builder()
+                    .productId(productUpdateDto.getProductId())
+                    .reviewCount(productMetrics.getReviewCount())
+                    .totalSalesCount(
+                        productMetrics.getTotalSalesCount() - productUpdateDto.getProductCount())
+                    .build());
+          }
         });
   }
 
@@ -320,11 +334,12 @@ public class ProductService {
       Product product = productRepository.findById(productUpdateDto.getProductId()).get();
       if (product != null & product.getStockQuantity() < 6) {
         productProducer.sendNotification(
-            MemberInfoForNotificationDto.builder().recipientId(product.getSellerId())
-                    .notificationType(NotificationTypeEnum.OUT_OF_STOCK)
-                    .recipientType(RecipientTypeEnum.ROLE_SELLER)
-                    .createdAt(LocalDateTime.now())
-                    .build());
+            MemberInfoForNotificationDto.builder()
+                .recipientId(product.getSellerId())
+                .notificationType(NotificationTypeEnum.OUT_OF_STOCK)
+                .recipientType(RecipientTypeEnum.ROLE_SELLER)
+                .createdAt(LocalDateTime.now())
+                .build());
       }
     }
   }
