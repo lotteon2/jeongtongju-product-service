@@ -24,6 +24,7 @@ import io.github.bitbox.bitbox.enums.NotificationTypeEnum;
 import io.github.bitbox.bitbox.enums.RecipientTypeEnum;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -327,11 +328,20 @@ public class ProductService {
         .collect(Collectors.toList());
   }
 
-  public List<Long> getProductStockByCart(ProductIdListDto productIdList) {
-    return productIdList.getProductIdList().stream()
-        .map(
-            id -> productRepository.findById(id).map(Product::getStockQuantity).orElseGet(() -> 0L))
-        .collect(Collectors.toList());
+  public HashMap<String, Long> getProductStockByCart(ProductIdListDto productIdList) {
+
+    HashMap<String, Long> productStock = new HashMap<>();
+
+    productIdList.getProductIdList().stream()
+        .forEach(
+            id -> {
+              log.info(productRepository.findById(id).orElseThrow(ProductNotFoundException::new).getStockQuantity().toString());
+              productStock.put(id, productRepository.findById(id).orElseThrow(ProductNotFoundException::new).getStockQuantity());
+            }
+            );
+
+    return productStock;
+
   }
 
   public void checkProductStock(List<ProductUpdateDto> productUpdateListDto) {

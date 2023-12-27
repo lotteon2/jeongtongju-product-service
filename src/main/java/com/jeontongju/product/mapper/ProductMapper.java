@@ -51,15 +51,16 @@ public class ProductMapper {
 
   public Shorts toShortsEntity(Long sellerId, CreateShortsDto createShortsDto) {
     return Shorts.builder()
-            .sellerId(sellerId)
-            .video(createShortsDto.getShortsVideoUrl())
-            .preview(createShortsDto.getShortsPreviewUrl())
-            .thumbnail(createShortsDto.getShortsThumbnailUrl())
-            .title(createShortsDto.getShortsTitle())
-            .description(createShortsDto.getShortsDescription())
-            .productId(createShortsDto.getProductId())
-            .type(createShortsDto.getProductId() == null ? ShortsTypeEnum.SELLER : ShortsTypeEnum.PRODUCT)
-            .build();
+        .sellerId(sellerId)
+        .video(createShortsDto.getShortsVideoUrl())
+        .preview(createShortsDto.getShortsPreviewUrl())
+        .thumbnail(createShortsDto.getShortsThumbnailUrl())
+        .title(createShortsDto.getShortsTitle())
+        .description(createShortsDto.getShortsDescription())
+        .productId(createShortsDto.getProductId())
+        .type(
+            createShortsDto.getProductId() == null ? ShortsTypeEnum.SELLER : ShortsTypeEnum.PRODUCT)
+        .build();
   }
 
   public ProductInfoDto toProductInfoDto(Product product, ProductUpdateDto productUpdateDto) {
@@ -84,6 +85,7 @@ public class ProductMapper {
         .productThumbnailImage(product.getProductThumbnailImage().getImageUrl())
         .stockQuantity(product.getStockQuantity())
         .isActivate(product.getIsActivate())
+        .isDeleted(product.getIsDeleted())
         .build();
   }
 }
