@@ -47,4 +47,15 @@ public class ProductClientController {
             .data(productService.getProductInfoForWish(productIdList))
             .build());
   }
+
+  @PostMapping("/wish-cart/stock")
+  ResponseEntity<FeignFormat<List<Long>>> getProductStock(
+          @RequestBody ProductIdListDto productIdList) {
+
+    return ResponseEntity.ok(
+            FeignFormat.<List<Long>>builder()
+                    .code(HttpStatus.OK.value())
+                    .data(productService.getProductStockByCart(productIdList))
+                    .build());
+  }
 }
