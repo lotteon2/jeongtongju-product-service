@@ -2,6 +2,8 @@ package com.jeontongju.product.controller;
 
 import com.jeontongju.product.service.ProductService;
 import io.github.bitbox.bitbox.dto.*;
+
+import java.util.HashMap;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,11 +51,13 @@ public class ProductClientController {
   }
 
   @PostMapping("/wish-cart/stock")
-  ResponseEntity<FeignFormat<List<Long>>> getProductStock(
+  ResponseEntity<FeignFormat<HashMap<String,Long>>> getProductStock(
           @RequestBody ProductIdListDto productIdList) {
 
+    log.info("장바구니" + productIdList.getProductIdList().get(0).toString());
+
     return ResponseEntity.ok(
-            FeignFormat.<List<Long>>builder()
+            FeignFormat.<HashMap<String,Long>>builder()
                     .code(HttpStatus.OK.value())
                     .data(productService.getProductStockByCart(productIdList))
                     .build());

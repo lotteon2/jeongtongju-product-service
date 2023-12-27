@@ -23,6 +23,7 @@ import io.github.bitbox.bitbox.dto.*;
 import io.github.bitbox.bitbox.enums.FailureTypeEnum;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -304,9 +305,18 @@ public class ProductService {
         .collect(Collectors.toList());
   }
 
-  public List<Long> getProductStockByCart(ProductIdListDto productIdList) {
-    return productIdList.getProductIdList().stream()
-        .map(id -> productRepository.findById(id).map(Product::getStockQuantity).orElseGet(() -> 0L))
-        .collect(Collectors.toList());
+  public HashMap<String, Long> getProductStockByCart(ProductIdListDto productIdList) {
+
+    HashMap<String, Long> productStock = new HashMap<>();
+
+    productIdList.getProductIdList().stream()
+        .forEach(
+            id ->
+                productRepository
+                    .findById(id)
+                    .map(product -> productStock.put(product.getProductId(), product.getStockQuantity()))
+                    .orElseGet(() -> productStock.put(id, 0L)));
+
+    return productStock;
   }
 }
