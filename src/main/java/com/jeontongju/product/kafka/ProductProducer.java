@@ -31,6 +31,14 @@ public class ProductProducer<T> {
     kafkaTemplate.send(KafkaTopicNameInfo.UPDATE_PRODUCT_TO_SEARCH, updateProductRecode);
   }
 
+  public void sendNotification(T memberInfoForNotificationDto) {
+    kafkaTemplate.send(KafkaTopicNameInfo.SEND_NOTIFICATION, memberInfoForNotificationDto);
+  }
+
+  public void sendErrorNotification(T serverErrorForNotificationDto) {
+    kafkaTemplate.send(KafkaTopicNameInfo.SEND_ERROR_NOTIFICATION, serverErrorForNotificationDto);
+  }
+
   public void sendUpdateProductToReview(T updateProductThumbnailImageUrl) {
     if (updateProductThumbnailImageUrl != null) {
       kafkaTemplate.send(KafkaTopicNameInfo.UPDATE_PRODUCT_TO_REVIEW, updateProductThumbnailImageUrl);

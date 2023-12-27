@@ -1,12 +1,11 @@
 package com.jeontongju.product.kafka;
 
 import com.jeontongju.product.service.ProductService;
-import io.github.bitbox.bitbox.dto.OrderInfoDto;
-import io.github.bitbox.bitbox.dto.ProductUpdateDto;
-import io.github.bitbox.bitbox.dto.ProductUpdateListDto;
-import io.github.bitbox.bitbox.dto.SellerInfoDto;
+import io.github.bitbox.bitbox.dto.*;
+import io.github.bitbox.bitbox.enums.NotificationTypeEnum;
+import io.github.bitbox.bitbox.enums.RecipientTypeEnum;
 import io.github.bitbox.bitbox.util.KafkaTopicNameInfo;
-import java.util.List;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -43,6 +42,15 @@ public class ProductConsumer {
     } catch (Exception e) {
       log.error(e.getMessage());
       sendOrderInfoDto(orderInfoDto); // 롤백
+
+      productProducer.sendErrorNotification(
+          ServerErrorForNotificationDto.builder()
+              .notificationType(NotificationTypeEnum.INTERNAL_PRODUCT_SERVER_ERROR)
+              .recipientId(orderInfoDto.getOrderCreationDto().getConsumerId())
+              .recipientType(RecipientTypeEnum.ROLE_CONSUMER)
+              .createdAt(LocalDateTime.now())
+              .error(orderInfoDto)
+              .build());
     }
   }
 
@@ -66,6 +74,7 @@ public class ProductConsumer {
   @KafkaListener(topics = KafkaTopicNameInfo.CANCEL_ORDER_STOCK)
   public void addStockFromCancelOrder(ProductUpdateListDto productUpdateDtoList) {
     productService.rollbackStock(productUpdateDtoList.getProductUpdateDtoList());
+    productService.checkProductStock(productUpdateDtoList.getProductUpdateDtoList());
     productService.addStockFromCancelOrder(productUpdateDtoList.getProductUpdateDtoList());
   }
 
