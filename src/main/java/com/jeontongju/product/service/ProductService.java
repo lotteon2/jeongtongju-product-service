@@ -311,13 +311,16 @@ public class ProductService {
 
     productIdList.getProductIdList().stream()
         .forEach(
-            id ->
-                productRepository
-                    .findById(id)
-                    .map(product -> productStock.put(product.getProductId(), product.getStockQuantity())).orElseThrow(ProductNotFoundException::new)
-//                    .orElseGet(() -> productStock.put(id, 0L))
+            id -> {
+              log.info(productRepository.findById(id).orElseThrow(ProductNotFoundException::new).getStockQuantity().toString());
+              productStock.put(id, productRepository.findById(id).orElseThrow(ProductNotFoundException::new).getStockQuantity());
+            }
 
-        );
+            //                    .map(product -> productStock.put(product.getProductId(),
+            // product.getStockQuantity())).orElseThrow(ProductNotFoundException::new)
+            //                    .orElseGet(() -> productStock.put(id, 0L))
+
+            );
 
     return productStock;
   }
