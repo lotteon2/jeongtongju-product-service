@@ -105,9 +105,10 @@ public class ProductService {
     Product product =
         productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
     product.setDeleted(true);
-    productProducer.sendDeleteProductToSearch(productId);
-    productProducer.sendDeleteProductToWish(productId);
-    productProducer.sendDeleteProductToReview(productId);
+    List<String> productIds = List.of(productId);
+    productProducer.sendDeleteProductToSearch(productIds);
+    productProducer.sendDeleteProductToWish(productIds);
+    productProducer.sendDeleteProductToReview(productIds);
   }
 
   @Transactional
@@ -300,6 +301,12 @@ public class ProductService {
             id ->
                 productMapper.toProductWishInfoDto(
                     productRepository.findById(id).orElseThrow(ProductNotFoundException::new)))
+        .collect(Collectors.toList());
+  }
+
+  public List<Long> getProductStockByCart(ProductIdListDto productIdList) {
+    return productIdList.getProductIdList().stream()
+        .map(id -> productRepository.findById(id).map(Product::getStockQuantity).orElseGet(() -> 0L))
         .collect(Collectors.toList());
   }
 }
