@@ -269,24 +269,23 @@ public class ProductService {
   public void updateProductSalesCountFromOrder(List<ProductUpdateDto> productUpdateDtoList) {
     productUpdateDtoList.forEach(
         productUpdateDto -> {
+          Long reviewCount = 0L;
+          Long totalSales = 0L;
+
           ProductMetrics productMetrics =
               productMetricsRepository.findById(productUpdateDto.getProductId()).get();
+
           if (productMetrics != null) {
-            productMetricsRepository.save(
-                ProductMetrics.builder()
-                    .productId(productUpdateDto.getProductId())
-                    .reviewCount(productMetrics.getReviewCount())
-                    .totalSalesCount(
-                        productMetrics.getTotalSalesCount() + productUpdateDto.getProductCount())
-                    .build());
-          } else {
-            productMetricsRepository.save(
-                ProductMetrics.builder()
-                    .productId(productUpdateDto.getProductId())
-                    .reviewCount(0L)
-                    .totalSalesCount(productUpdateDto.getProductCount())
-                    .build());
+            reviewCount = productMetrics.getReviewCount();
+            totalSales = productMetrics.getTotalSalesCount();
           }
+
+          productMetricsRepository.save(
+              ProductMetrics.builder()
+                  .productId(productUpdateDto.getProductId())
+                  .reviewCount(reviewCount)
+                  .totalSalesCount(totalSales + productUpdateDto.getProductCount())
+                  .build());
         });
   }
 
