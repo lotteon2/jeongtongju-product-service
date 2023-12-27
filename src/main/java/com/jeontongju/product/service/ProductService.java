@@ -25,6 +25,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import io.github.bitbox.bitbox.enums.NotificationTypeEnum;
+import io.github.bitbox.bitbox.enums.RecipientTypeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -306,7 +309,23 @@ public class ProductService {
 
   public List<Long> getProductStockByCart(ProductIdListDto productIdList) {
     return productIdList.getProductIdList().stream()
-        .map(id -> productRepository.findById(id).map(Product::getStockQuantity).orElseGet(() -> 0L))
+        .map(
+            id -> productRepository.findById(id).map(Product::getStockQuantity).orElseGet(() -> 0L))
         .collect(Collectors.toList());
+  }
+
+  public void checkProductStock(List<ProductUpdateDto> productUpdateListDto) {
+    for (ProductUpdateDto productUpdateDto : productUpdateListDto) {
+
+      Product product = productRepository.findById(productUpdateDto.getProductId()).get();
+      if (product != null & product.getStockQuantity() < 6) {
+        productProducer.sendNotification(
+            MemberInfoForNotificationDto.builder().recipientId(product.getSellerId())
+                    .notificationType(NotificationTypeEnum.OUT_OF_STOCK)
+                    .recipientType(RecipientTypeEnum.ROLE_SELLER)
+                    .createdAt(LocalDateTime.now())
+                    .build());
+      }
+    }
   }
 }
