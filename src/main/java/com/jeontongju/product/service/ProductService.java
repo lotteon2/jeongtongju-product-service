@@ -314,8 +314,10 @@ public class ProductService {
             id ->
                 productRepository
                     .findById(id)
-                    .map(product -> productStock.put(product.getProductId(), product.getStockQuantity()))
-                    .orElseGet(() -> productStock.put(id, 0L)));
+                    .map(product -> productStock.put(product.getProductId(), product.getStockQuantity())).orElseThrow(ProductNotFoundException::new)
+//                    .orElseGet(() -> productStock.put(id, 0L))
+
+        );
 
     return productStock;
   }

@@ -28,6 +28,8 @@ public class ApiControllerAdvice extends ResponseEntityExceptionHandler {
   @ExceptionHandler(DomainException.class)
   public ResponseEntity<ResponseFormat<Void>> handleDomainException(DomainException e) {
     log.error("{PRODUCT}", e.getMessage());
+    log.error(e.getCause().toString());
+    log.error("에러");
     HttpStatus status = e.getStatus();
     ResponseFormat<Void> body =
         ResponseFormat.<Void>builder()
