@@ -87,6 +87,13 @@ public class ProductService {
             .action("INSERT")
             .build());
 
+    productMetricsRepository.save(
+            ProductMetrics.builder()
+                    .productId(savedProduct.getProductId())
+                    .reviewCount(0L)
+                    .totalSalesCount(0L)
+                    .build());
+
     // kafka - search
     productProducer.sendCreateProductToSearch(createProductRecord);
 
