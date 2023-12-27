@@ -88,11 +88,11 @@ public class ProductService {
             .build());
 
     productMetricsRepository.save(
-            ProductMetrics.builder()
-                    .productId(savedProduct.getProductId())
-                    .reviewCount(0L)
-                    .totalSalesCount(0L)
-                    .build());
+        ProductMetrics.builder()
+            .productId(savedProduct.getProductId())
+            .reviewCount(0L)
+            .totalSalesCount(0L)
+            .build());
 
     // kafka - search
     productProducer.sendCreateProductToSearch(createProductRecord);
@@ -284,7 +284,7 @@ public class ProductService {
                 ProductMetrics.builder()
                     .productId(productUpdateDto.getProductId())
                     .reviewCount(0L)
-                    .totalSalesCount(0L)
+                    .totalSalesCount(productUpdateDto.getProductCount())
                     .build());
           }
         });
