@@ -69,6 +69,7 @@ public class ProductConsumer {
   @KafkaListener(topics = KafkaTopicNameInfo.UPDATE_PRODUCT_SALES_COUNT)
   public void updateProductSalesCountFromOrder(ProductUpdateListDto productUpdateDtoList) {
     productService.updateProductSalesCountFromOrder(productUpdateDtoList.getProductUpdateDtoList());
+    productService.checkProductStock(productUpdateDtoList.getProductUpdateDtoList());
   }
 
   @KafkaListener(topics = KafkaTopicNameInfo.CANCEL_ORDER_STOCK)
