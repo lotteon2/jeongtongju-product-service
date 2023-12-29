@@ -26,7 +26,7 @@ public class CreateShortsDto {
   private String shortsVideoUrl;
 
   @NotNull(message = "null 이 불가합니다.")
-  private String shortsThumbnailUrl;
+  private String shortsThumbnailImageUrl;
 
   private String productId;
 
