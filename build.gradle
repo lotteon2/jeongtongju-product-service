@@ -30,11 +30,12 @@ dependencies {
 	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-sleuth'
 	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-zipkin', version: '2.2.8.RELEASE'
 
+	implementation group: 'io.github.lotteon2', name: 'bitbox', version: '1.3.0'
+
 	implementation group: 'io.micrometer', name: 'micrometer-registry-prometheus'
 	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-config'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.cloud:spring-cloud-starter-bus-kafka'
-	//implementation group: 'io.github.lotteon2', name: 'bitbox', version: '1.0.0'
 
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE' // spring aws
 	implementation 'com.amazonaws:aws-java-sdk-dynamodb:1.12.353' // aws 제공 dynamodb sdk

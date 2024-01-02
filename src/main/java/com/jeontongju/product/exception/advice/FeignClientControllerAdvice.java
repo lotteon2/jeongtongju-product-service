@@ -1,8 +1,8 @@
 package com.jeontongju.product.exception.advice;
 
-import com.jeontongju.product.dto.temp.FeignFormat;
-import com.jeontongju.product.dto.temp.ResponseFormat;
-import com.jeontongju.product.exception.common.FeignException;
+import com.jeontongju.product.exception.common.CustomFailureFeignException;
+import io.github.bitbox.bitbox.dto.FeignFormat;
+import io.github.bitbox.bitbox.dto.ResponseFormat;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.client.circuitbreaker.NoFallbackAvailableException;
@@ -17,15 +17,17 @@ public class FeignClientControllerAdvice {
 
   private static final String FEIGN_CLIENT_EXCEPTION_MESSAGE = "FEIGN 통신 에러 ";
 
-  @ExceptionHandler(FeignException.class)
-  public ResponseEntity<FeignFormat<Void>> handleDomainException(FeignException e) {
+  @ExceptionHandler(CustomFailureFeignException.class)
+  public ResponseEntity<FeignFormat<Void>> handleCustomFailureException(
+      CustomFailureFeignException e) {
     log.error(e.getMessage());
-    HttpStatus status = e.getStatus();
+    HttpStatus status = HttpStatus.OK;
     FeignFormat<Void> body =
         FeignFormat.<Void>builder()
             .code(status.value())
             .message(status.name())
             .detail(e.getMessage())
+            .failure(e.getFailure())
             .build();
 
     return ResponseEntity.status(status.value()).body(body);

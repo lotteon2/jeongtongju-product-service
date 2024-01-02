@@ -1,8 +1,8 @@
 package com.jeontongju.product.exception.advice;
 
-import com.jeontongju.product.dto.temp.ResponseFormat;
 import com.jeontongju.product.exception.common.DomainException;
 import com.jeontongju.product.exception.common.InvalidPermissionException;
+import io.github.bitbox.bitbox.dto.ResponseFormat;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.KafkaException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -29,6 +28,8 @@ public class ApiControllerAdvice extends ResponseEntityExceptionHandler {
   @ExceptionHandler(DomainException.class)
   public ResponseEntity<ResponseFormat<Void>> handleDomainException(DomainException e) {
     log.error("{PRODUCT}", e.getMessage());
+    log.error(e.getCause().toString());
+    log.error("에러");
     HttpStatus status = e.getStatus();
     ResponseFormat<Void> body =
         ResponseFormat.<Void>builder()

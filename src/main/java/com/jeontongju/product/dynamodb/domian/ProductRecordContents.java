@@ -85,8 +85,6 @@ public class ProductRecordContents {
         .categoryId(savedProduct.getCategory().getCategoryId())
         .sellerId(savedProduct.getSellerId())
         .shortsId(shortsId)
-        .totalSalesCount(savedProduct.getTotalSalesCount())
-        .reviewCount(savedProduct.getReviewCount())
         .storeName(savedProduct.getStoreName())
         .storeImageUrl(savedProduct.getStoreImageUrl())
         .createdAt(savedProduct.getCreatedAt().toString())
