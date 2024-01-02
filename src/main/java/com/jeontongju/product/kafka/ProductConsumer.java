@@ -68,14 +68,17 @@ public class ProductConsumer {
 
   @KafkaListener(topics = KafkaTopicNameInfo.UPDATE_PRODUCT_SALES_COUNT)
   public void updateProductSalesCountFromOrder(ProductUpdateListDto productUpdateDtoList) {
-    productService.updateProductSalesCountFromOrder(productUpdateDtoList.getProductUpdateDtoList());
+//    productService.updateProductSalesCountFromOrder(productUpdateDtoList.getProductUpdateDtoList());
+    log.info("상품" + productUpdateDtoList.getProductUpdateDtoList().get(0).getProductId().toString() + "----" + productUpdateDtoList.getProductUpdateDtoList().get(0).getProductCount().toString() );
+
+    productService.checkProductStock(productUpdateDtoList.getProductUpdateDtoList());
   }
 
   @KafkaListener(topics = KafkaTopicNameInfo.CANCEL_ORDER_STOCK)
   public void addStockFromCancelOrder(ProductUpdateListDto productUpdateDtoList) {
     productService.rollbackStock(productUpdateDtoList.getProductUpdateDtoList());
     productService.checkProductStock(productUpdateDtoList.getProductUpdateDtoList());
-    productService.addStockFromCancelOrder(productUpdateDtoList.getProductUpdateDtoList());
+//    productService.addStockFromCancelOrder(productUpdateDtoList.getProductUpdateDtoList());
   }
 
   public void sendOrderInfoDto(OrderInfoDto orderInfoDto) {

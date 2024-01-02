@@ -54,7 +54,7 @@ public class ProductMapper {
         .sellerId(sellerId)
         .video(createShortsDto.getShortsVideoUrl())
         .preview(createShortsDto.getShortsPreviewUrl())
-        .thumbnail(createShortsDto.getShortsThumbnailUrl())
+        .thumbnail(createShortsDto.getShortsThumbnailImageUrl())
         .title(createShortsDto.getShortsTitle())
         .description(createShortsDto.getShortsDescription())
         .productId(createShortsDto.getProductId())

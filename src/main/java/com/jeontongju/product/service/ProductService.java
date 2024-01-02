@@ -345,6 +345,7 @@ public class ProductService {
   }
 
   public void checkProductStock(List<ProductUpdateDto> productUpdateListDto) {
+    log.info("상품" + productUpdateListDto.get(0).getProductId().toString() + "----" + productUpdateListDto.get(0).getProductCount().toString() );
     for (ProductUpdateDto productUpdateDto : productUpdateListDto) {
 
       Product product = productRepository.findById(productUpdateDto.getProductId()).get();
