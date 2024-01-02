@@ -68,17 +68,67 @@ public class ProductConsumer {
 
   @KafkaListener(topics = KafkaTopicNameInfo.UPDATE_PRODUCT_SALES_COUNT)
   public void updateProductSalesCountFromOrder(ProductUpdateListDto productUpdateDtoList) {
-//    productService.updateProductSalesCountFromOrder(productUpdateDtoList.getProductUpdateDtoList());
-    log.info("상품" + productUpdateDtoList.getProductUpdateDtoList().get(0).getProductId().toString() + "----" + productUpdateDtoList.getProductUpdateDtoList().get(0).getProductCount().toString() );
+    log.info(
+        "상품"
+            + productUpdateDtoList.getProductUpdateDtoList().get(0).getProductId().toString()
+            + "----"
+            + productUpdateDtoList.getProductUpdateDtoList().get(0).getProductCount().toString());
 
+    // 재고 확인 후, 5개 미만 알림
     productService.checkProductStock(productUpdateDtoList.getProductUpdateDtoList());
+
+    // 주문으로 판매량 증가
+    productService.addProductMetricsFromOrder(productUpdateDtoList.getProductUpdateDtoList());
   }
 
+  // 주문 취소 로직
   @KafkaListener(topics = KafkaTopicNameInfo.CANCEL_ORDER_STOCK)
-  public void addStockFromCancelOrder(ProductUpdateListDto productUpdateDtoList) {
-    productService.rollbackStock(productUpdateDtoList.getProductUpdateDtoList());
-    productService.checkProductStock(productUpdateDtoList.getProductUpdateDtoList());
-//    productService.addStockFromCancelOrder(productUpdateDtoList.getProductUpdateDtoList());
+  public void addStockFromCancelOrder(OrderCancelDto orderCancelDto) {
+    try {
+      log.info(
+          "상품"
+              + orderCancelDto.getProductUpdateDtoList().get(0).getProductId().toString()
+              + orderCancelDto.getProductUpdateDtoList().get(0).getProductCount().toString());
+      // 주문 취소로 재고 복구
+      productService.rollbackStock(orderCancelDto.getProductUpdateDtoList());
+      // 결제 서버로 카프카
+      productProducer.cancelOrderPayment(orderCancelDto);
+      // 주문 취소로 판매량 감소
+      productService.reduceProductMetricsFromCancelOrder(orderCancelDto.getProductUpdateDtoList());
+
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      sendOrderCancel(orderCancelDto); // 롤백 셋 중 하나로
+      // 재고에서 터져서 알림
+      productProducer.sendNotificationByOrderCancelFail(
+          ServerErrorCancelingOrderForNotificationDto.builder()
+              .recipientId(orderCancelDto.getConsumerId())
+              .recipientType(RecipientTypeEnum.ROLE_CONSUMER)
+              .notificationType(NotificationTypeEnum.INTERNAL_PRODUCT_SERVER_ERROR)
+              .createdAt(LocalDateTime.now())
+              .orderCancelDto(orderCancelDto)
+              .build());
+    }
+  }
+
+  // 결제 서버애서 터져서 주문 취소 롤백
+  @KafkaListener(topics = KafkaTopicNameInfo.RECOVER_CANCEL_ORDER_STOCK)
+  public void recoverFromCancelOrder(OrderCancelDto orderCancelDto) {
+    try {
+      log.info(
+          "상품"
+              + orderCancelDto.getProductUpdateDtoList().get(0).getProductId().toString()
+              + "----"
+              + orderCancelDto.getProductUpdateDtoList().get(0).getProductCount().toString());
+      // 주문 취소의 실패로 재고 다시 차감
+      productService.reduceStock(orderCancelDto.getProductUpdateDtoList());
+      // 주문 취소의 실패로 판매량 다시 증가
+      productService.addProductMetricsFromOrder(orderCancelDto.getProductUpdateDtoList());
+    } catch (Exception e) {
+      log.error(e.getMessage());
+    } finally {
+      sendOrderCancel(orderCancelDto); // 롤백 셋 중 하나로
+    }
   }
 
   public void sendOrderInfoDto(OrderInfoDto orderInfoDto) {
@@ -88,6 +138,19 @@ public class ProductConsumer {
     } else if (orderInfoDto.getUserPointUpdateDto().getPoint() != null) {
       // 포인트
       productProducer.addPointByCancel(orderInfoDto);
+    }
+  }
+
+  // 주문 취소의 실패로 셋 중 하나
+  public void sendOrderCancel(OrderCancelDto orderCancelDto) {
+    if (orderCancelDto.getCouponCode() != null) {
+      // 쿠폰
+      productProducer.recoverCancelOrderCoupon(orderCancelDto);
+    } else if (orderCancelDto.getPoint() != null) {
+      // 포인트
+      productProducer.recoverCancelOrderPoint(orderCancelDto);
+    } else {
+      productProducer.recoverCancelOrder(orderCancelDto);
     }
   }
 }
