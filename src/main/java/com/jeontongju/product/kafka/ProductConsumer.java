@@ -101,12 +101,11 @@ public class ProductConsumer {
       sendOrderCancel(orderCancelDto); // 롤백 셋 중 하나로
       // 재고에서 터져서 알림
       productProducer.sendNotificationByOrderCancelFail(
-          ServerErrorCancelingOrderForNotificationDto.builder()
+          MemberInfoForNotificationDto.builder()
               .recipientId(orderCancelDto.getConsumerId())
               .recipientType(RecipientTypeEnum.ROLE_CONSUMER)
               .notificationType(NotificationTypeEnum.INTERNAL_PRODUCT_SERVER_ERROR)
               .createdAt(LocalDateTime.now())
-              .orderCancelDto(orderCancelDto)
               .build());
     }
   }
