@@ -267,7 +267,7 @@ public class ProductService {
   }
 
   @Transactional
-  public void updateProductSalesCountFromOrder(List<ProductUpdateDto> productUpdateDtoList) {
+  public void addProductMetricsFromOrder(List<ProductUpdateDto> productUpdateDtoList) {
     productUpdateDtoList.forEach(
         productUpdateDto -> {
           Long reviewCount = 0L;
@@ -291,7 +291,7 @@ public class ProductService {
   }
 
   @Transactional
-  public void addStockFromCancelOrder(List<ProductUpdateDto> productUpdateDtoList) {
+  public void reduceProductMetricsFromCancelOrder(List<ProductUpdateDto> productUpdateDtoList) {
 
     productUpdateDtoList.forEach(
         productUpdateDto -> {
@@ -360,4 +360,5 @@ public class ProductService {
       }
     }
   }
+
 }
