@@ -60,30 +60,4 @@ public class ProductProducer<T> {
     kafkaTemplate.send(KafkaTopicNameInfo.ADD_STOCK, orderInfoDto);
   }
 
-
-  // 주문 취소 성공으로 결제 서버에
-  public void cancelOrderPayment(T orderCancelDto) {
-    kafkaTemplate.send(KafkaTopicNameInfo.CANCEL_ORDER_PAYMENT, orderCancelDto);
-  }
-
-
-  // 주문 취소 중 터져서, 포인트 서버 중
-  public void recoverCancelOrderCoupon(T orderCancelDto) {
-    kafkaTemplate.send(KafkaTopicNameInfo.RECOVER_CANCEL_ORDER_COUPON, orderCancelDto);
-  }
-
-  public void recoverCancelOrderPoint(T orderCancelDto) {
-    kafkaTemplate.send(KafkaTopicNameInfo.RECOVER_CANCEL_ORDER_POINT, orderCancelDto);
-  }
-
-  public void recoverCancelOrder(T orderCancelDto) {
-    kafkaTemplate.send(KafkaTopicNameInfo.RECOVER_CANCEL_ORDER, orderCancelDto);
-  }
-
-  public void sendNotificationByOrderCancelFail(T serverErrorCancelingOrderForNotificationDto) {
-    kafkaTemplate.send(KafkaTopicNameInfo.SEND_ERROR_CANCELING_ORDER_NOTIFICATION, serverErrorCancelingOrderForNotificationDto);
-  }
-
-
-
 }
