@@ -1,5 +1,8 @@
 package com.jeontongju.product.dto.request;
 
+import com.jeontongju.product.enums.ConceptTypeEnum;
+import com.jeontongju.product.enums.FoodTypeEnum;
+import com.jeontongju.product.enums.RawMeterialTypeEnum;
 import com.jeontongju.product.vo.Taste;
 import java.util.List;
 import javax.validation.constraints.*;
@@ -61,9 +64,9 @@ public class ProductDto {
   private Taste taste;
 
   @Size(max = 2, min = 1, message = "1개 또는 2개 항목을 가져야 합니다.")
-  private List<String> rawMaterial;
+  private List<RawMeterialTypeEnum> rawMaterial;
 
-  private List<String> food;
+  private List<FoodTypeEnum> food;
 
-  private List<String> concept;
+  private List<ConceptTypeEnum> concept;
 }

@@ -68,12 +68,6 @@ public class ProductConsumer {
 
   @KafkaListener(topics = KafkaTopicNameInfo.UPDATE_PRODUCT_SALES_COUNT)
   public void updateProductSalesCountFromOrder(ProductUpdateListDto productUpdateDtoList) {
-    log.info(
-        "상품"
-            + productUpdateDtoList.getProductUpdateDtoList().get(0).getProductId().toString()
-            + "----"
-            + productUpdateDtoList.getProductUpdateDtoList().get(0).getProductCount().toString());
-
     // 재고 확인 후, 5개 미만 알림
     productService.checkProductStock(productUpdateDtoList.getProductUpdateDtoList());
 
@@ -85,10 +79,6 @@ public class ProductConsumer {
   @KafkaListener(topics = KafkaTopicNameInfo.CANCEL_ORDER_STOCK)
   public void addStockFromCancelOrder(OrderCancelDto orderCancelDto) {
     try {
-      log.info(
-          "상품"
-              + orderCancelDto.getProductUpdateDtoList().get(0).getProductId().toString()
-              + orderCancelDto.getProductUpdateDtoList().get(0).getProductCount().toString());
       // 주문 취소로 재고 복구
       productService.rollbackStock(orderCancelDto.getProductUpdateDtoList());
       // 주문 취소로 판매량 감소
