@@ -27,11 +27,9 @@ public class ProductProducer<T> {
     kafkaTemplate.send(KafkaTopicNameInfo.SEND_ERROR_NOTIFICATION, serverErrorForNotificationDto);
   }
 
-  public void sendUpdateProductToReview(T updateProductThumbnailImageUrl) {
-    if (updateProductThumbnailImageUrl != null) {
-      kafkaTemplate.send(KafkaTopicNameInfo.UPDATE_PRODUCT_TO_REVIEW, updateProductThumbnailImageUrl);
-    }
+  public void sendUpdateProductToReview(T productImageInfoDto) {
 
+    kafkaTemplate.send(KafkaTopicNameInfo.UPDATE_PRODUCT_TO_REVIEW, productImageInfoDto);
   }
 
   // create order - 상품에서 주문으로 재고 성공으로 보내기
@@ -47,5 +45,4 @@ public class ProductProducer<T> {
   public void addPointByCancel(T orderInfoDto) {
     kafkaTemplate.send(KafkaTopicNameInfo.ADD_STOCK, orderInfoDto);
   }
-
 }
