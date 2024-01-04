@@ -95,9 +95,6 @@ public class ProductService {
             .totalSalesCount(0L)
             .build());
 
-    // kafka - search
-    productProducer.sendCreateProductToSearch(createProductRecord);
-
     return savedProduct;
   }
 
@@ -115,7 +112,6 @@ public class ProductService {
         productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
     product.setDeleted(true);
     List<String> productIds = List.of(productId);
-    productProducer.sendDeleteProductToSearch(productIds);
     productProducer.sendDeleteProductToWish(productIds);
     productProducer.sendDeleteProductToReview(productIds);
   }
@@ -131,7 +127,6 @@ public class ProductService {
           product.setDeleted(true);
           productIds.add(product.getProductId());
         });
-    productProducer.sendDeleteProductToSearch(productIds);
     productProducer.sendDeleteProductToWish(productIds);
     productProducer.sendDeleteProductToReview(productIds);
   }
@@ -154,9 +149,6 @@ public class ProductService {
             .productRecord(updateProductRecord)
             .action("UPDATE")
             .build());
-
-    // kafka search
-    productProducer.sendUpdateProductToSearch(updateProductRecord);
   }
 
   @Transactional
@@ -181,7 +173,6 @@ public class ProductService {
             .build());
 
     // kafka review, search
-    productProducer.sendUpdateProductToSearch(updateProductRecord);
     productProducer.sendUpdateProductToReview(modifyProductInfoDto.getProductThumbnailImageUrl());
   }
 
@@ -251,6 +242,21 @@ public class ProductService {
       }
       // 재고 차감
       product.setStockQuantity(product.getStockQuantity() - productUpdateDto.getProductCount());
+
+      // 변경 이력 - dynamo db
+      ProductRecordContents updateProductRecord =
+              ProductRecordContents.toDto(product.getProductId(), product, null);
+
+      productRecordRepository.save(
+              ProductRecord.builder()
+                      .productRecordId(
+                              ProductRecordId.builder()
+                                      .productId(product.getProductId())
+                                      .createdAt(LocalDateTime.now().toString())
+                                      .build())
+                      .productRecord(updateProductRecord)
+                      .action("UPDATE")
+                      .build());
     }
   }
 
@@ -263,6 +269,21 @@ public class ProductService {
               .orElseThrow(() -> new StockException("존재 하지 않는 상품"));
       // 재고 복구
       product.setStockQuantity(product.getStockQuantity() + productUpdateDto.getProductCount());
+
+      // 변경 이력 - dynamo db
+      ProductRecordContents updateProductRecord =
+              ProductRecordContents.toDto(product.getProductId(), product, null);
+
+      productRecordRepository.save(
+              ProductRecord.builder()
+                      .productRecordId(
+                              ProductRecordId.builder()
+                                      .productId(product.getProductId())
+                                      .createdAt(LocalDateTime.now().toString())
+                                      .build())
+                      .productRecord(updateProductRecord)
+                      .action("UPDATE")
+                      .build());
     }
   }
 

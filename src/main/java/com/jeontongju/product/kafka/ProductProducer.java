@@ -11,24 +11,12 @@ public class ProductProducer<T> {
 
   private final KafkaTemplate<String, T> kafkaTemplate;
 
-  public void sendCreateProductToSearch(T createProductRecode) {
-    kafkaTemplate.send(KafkaTopicNameInfo.CREATE_PRODUCT_TO_SEARCH, createProductRecode);
-  }
-
-  public void sendDeleteProductToSearch(T productIds) {
-    kafkaTemplate.send(KafkaTopicNameInfo.DELETE_PRODUCT_TO_SEARCH, productIds);
-  }
-
   public void sendDeleteProductToWish(T productIds) {
     kafkaTemplate.send(KafkaTopicNameInfo.DELETE_PRODUCT_TO_WISH_CART, productIds);
   }
 
   public void sendDeleteProductToReview(T productIds) {
     kafkaTemplate.send(KafkaTopicNameInfo.DELETE_PRODUCT_TO_REVIEW, productIds);
-  }
-
-  public void sendUpdateProductToSearch(T updateProductRecode) {
-    kafkaTemplate.send(KafkaTopicNameInfo.UPDATE_PRODUCT_TO_SEARCH, updateProductRecode);
   }
 
   public void sendNotification(T memberInfoForNotificationDto) {
