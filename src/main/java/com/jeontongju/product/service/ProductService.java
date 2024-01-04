@@ -273,10 +273,9 @@ public class ProductService {
           Long reviewCount = 0L;
           Long totalSales = 0L;
 
-          ProductMetrics productMetrics =
-              productMetricsRepository.findById(productUpdateDto.getProductId()).get();
-
-          if (productMetrics != null) {
+          if (productMetricsRepository.existsById(productUpdateDto.getProductId())) {
+            ProductMetrics productMetrics =
+                    productMetricsRepository.findById(productUpdateDto.getProductId()).get();
             reviewCount = productMetrics.getReviewCount();
             totalSales = productMetrics.getTotalSalesCount();
           }
@@ -295,9 +294,10 @@ public class ProductService {
 
     productUpdateDtoList.forEach(
         productUpdateDto -> {
-          ProductMetrics productMetrics =
-              productMetricsRepository.findById(productUpdateDto.getProductId()).get();
-          if (productMetrics != null) {
+
+          if (productMetricsRepository.existsById(productUpdateDto.getProductId())) {
+            ProductMetrics productMetrics =
+                    productMetricsRepository.findById(productUpdateDto.getProductId()).get();
             productMetricsRepository.save(
                 ProductMetrics.builder()
                     .productId(productUpdateDto.getProductId())
