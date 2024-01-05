@@ -172,8 +172,13 @@ public class ProductService {
             .action("UPDATE")
             .build());
 
-    // kafka review, search
-    productProducer.sendUpdateProductToReview(modifyProductInfoDto.getProductThumbnailImageUrl());
+    // kafka review
+    if (modifyProductInfoDto.getProductThumbnailImageUrl() != null) {
+      productProducer.sendUpdateProductToReview(ProductImageInfoDto.builder()
+              .productId(productId)
+              .productThumbnailImageUrl(modifyProductInfoDto.getProductThumbnailImageUrl())
+              .build());
+    }
   }
 
   @Transactional
@@ -245,18 +250,18 @@ public class ProductService {
 
       // 변경 이력 - dynamo db
       ProductRecordContents updateProductRecord =
-              ProductRecordContents.toDto(product.getProductId(), product, null);
+          ProductRecordContents.toDto(product.getProductId(), product, null);
 
       productRecordRepository.save(
-              ProductRecord.builder()
-                      .productRecordId(
-                              ProductRecordId.builder()
-                                      .productId(product.getProductId())
-                                      .createdAt(LocalDateTime.now().toString())
-                                      .build())
-                      .productRecord(updateProductRecord)
-                      .action("UPDATE")
-                      .build());
+          ProductRecord.builder()
+              .productRecordId(
+                  ProductRecordId.builder()
+                      .productId(product.getProductId())
+                      .createdAt(LocalDateTime.now().toString())
+                      .build())
+              .productRecord(updateProductRecord)
+              .action("UPDATE")
+              .build());
     }
   }
 
@@ -272,18 +277,18 @@ public class ProductService {
 
       // 변경 이력 - dynamo db
       ProductRecordContents updateProductRecord =
-              ProductRecordContents.toDto(product.getProductId(), product, null);
+          ProductRecordContents.toDto(product.getProductId(), product, null);
 
       productRecordRepository.save(
-              ProductRecord.builder()
-                      .productRecordId(
-                              ProductRecordId.builder()
-                                      .productId(product.getProductId())
-                                      .createdAt(LocalDateTime.now().toString())
-                                      .build())
-                      .productRecord(updateProductRecord)
-                      .action("UPDATE")
-                      .build());
+          ProductRecord.builder()
+              .productRecordId(
+                  ProductRecordId.builder()
+                      .productId(product.getProductId())
+                      .createdAt(LocalDateTime.now().toString())
+                      .build())
+              .productRecord(updateProductRecord)
+              .action("UPDATE")
+              .build());
     }
   }
 
@@ -296,7 +301,7 @@ public class ProductService {
 
           if (productMetricsRepository.existsById(productUpdateDto.getProductId())) {
             ProductMetrics productMetrics =
-                    productMetricsRepository.findById(productUpdateDto.getProductId()).get();
+                productMetricsRepository.findById(productUpdateDto.getProductId()).get();
             reviewCount = productMetrics.getReviewCount();
             totalSales = productMetrics.getTotalSalesCount();
           }
@@ -315,10 +320,9 @@ public class ProductService {
 
     productUpdateDtoList.forEach(
         productUpdateDto -> {
-
           if (productMetricsRepository.existsById(productUpdateDto.getProductId())) {
             ProductMetrics productMetrics =
-                    productMetricsRepository.findById(productUpdateDto.getProductId()).get();
+                productMetricsRepository.findById(productUpdateDto.getProductId()).get();
             productMetricsRepository.save(
                 ProductMetrics.builder()
                     .productId(productUpdateDto.getProductId())
@@ -356,17 +360,29 @@ public class ProductService {
     productIdList.getProductIdList().stream()
         .forEach(
             id -> {
-              log.info(productRepository.findById(id).orElseThrow(ProductNotFoundException::new).getStockQuantity().toString());
-              productStock.put(id, productRepository.findById(id).orElseThrow(ProductNotFoundException::new).getStockQuantity());
-            }
-            );
+              log.info(
+                  productRepository
+                      .findById(id)
+                      .orElseThrow(ProductNotFoundException::new)
+                      .getStockQuantity()
+                      .toString());
+              productStock.put(
+                  id,
+                  productRepository
+                      .findById(id)
+                      .orElseThrow(ProductNotFoundException::new)
+                      .getStockQuantity());
+            });
 
     return productStock;
-
   }
 
   public void checkProductStock(List<ProductUpdateDto> productUpdateListDto) {
-    log.info("상품" + productUpdateListDto.get(0).getProductId().toString() + "----" + productUpdateListDto.get(0).getProductCount().toString() );
+    log.info(
+        "상품"
+            + productUpdateListDto.get(0).getProductId().toString()
+            + "----"
+            + productUpdateListDto.get(0).getProductCount().toString());
     for (ProductUpdateDto productUpdateDto : productUpdateListDto) {
 
       Product product = productRepository.findById(productUpdateDto.getProductId()).get();
@@ -381,5 +397,4 @@ public class ProductService {
       }
     }
   }
-
 }
