@@ -16,6 +16,9 @@ public class ProductMetrics {
   @DynamoDBHashKey(attributeName = "product_id")
   private String productId;
 
+  @DynamoDBAttribute(attributeName = "seller_id")
+  private Long sellerId;
+
   @DynamoDBAttribute(attributeName = "review_count")
   private Long reviewCount;
 

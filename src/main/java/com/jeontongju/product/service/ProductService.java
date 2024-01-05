@@ -91,6 +91,7 @@ public class ProductService {
     productMetricsRepository.save(
         ProductMetrics.builder()
             .productId(savedProduct.getProductId())
+            .sellerId(savedProduct.getSellerId())
             .reviewCount(0L)
             .totalSalesCount(0L)
             .build());
@@ -174,7 +175,8 @@ public class ProductService {
 
     // kafka review
     if (modifyProductInfoDto.getProductThumbnailImageUrl() != null) {
-      productProducer.sendUpdateProductToReview(ProductImageInfoDto.builder()
+      productProducer.sendUpdateProductToReview(
+          ProductImageInfoDto.builder()
               .productId(productId)
               .productThumbnailImageUrl(modifyProductInfoDto.getProductThumbnailImageUrl())
               .build());
@@ -298,18 +300,21 @@ public class ProductService {
         productUpdateDto -> {
           Long reviewCount = 0L;
           Long totalSales = 0L;
+          Long sellerId = null;
 
           if (productMetricsRepository.existsById(productUpdateDto.getProductId())) {
             ProductMetrics productMetrics =
                 productMetricsRepository.findById(productUpdateDto.getProductId()).get();
             reviewCount = productMetrics.getReviewCount();
             totalSales = productMetrics.getTotalSalesCount();
+            sellerId = productMetrics.getSellerId();
           }
 
           productMetricsRepository.save(
               ProductMetrics.builder()
                   .productId(productUpdateDto.getProductId())
                   .reviewCount(reviewCount)
+                  .sellerId(sellerId)
                   .totalSalesCount(totalSales + productUpdateDto.getProductCount())
                   .build());
         });
@@ -326,6 +331,7 @@ public class ProductService {
             productMetricsRepository.save(
                 ProductMetrics.builder()
                     .productId(productUpdateDto.getProductId())
+                    .sellerId(productMetrics.getSellerId())
                     .reviewCount(productMetrics.getReviewCount())
                     .totalSalesCount(
                         productMetrics.getTotalSalesCount() - productUpdateDto.getProductCount())
