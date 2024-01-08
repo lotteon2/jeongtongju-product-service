@@ -90,10 +90,16 @@ public class ProductService {
 
     productMetricsRepository.save(
         ProductMetrics.builder()
-            .productId(savedProduct.getProductId())
+            .productMetricsId(
+                ProductMetricsId.builder()
+                    .productId(savedProduct.getProductId())
+                    .createdAt(LocalDateTime.now().toString())
+                    .build())
             .sellerId(savedProduct.getSellerId())
+            .action("INSERT")
             .reviewCount(0L)
             .totalSalesCount(0L)
+            .totalSalesPrice(0L)
             .build());
 
     return savedProduct;
@@ -298,24 +304,23 @@ public class ProductService {
   public void addProductMetricsFromOrder(List<ProductUpdateDto> productUpdateDtoList) {
     productUpdateDtoList.forEach(
         productUpdateDto -> {
-          Long reviewCount = 0L;
-          Long totalSales = 0L;
-          Long sellerId = null;
-
-          if (productMetricsRepository.existsById(productUpdateDto.getProductId())) {
-            ProductMetrics productMetrics =
-                productMetricsRepository.findById(productUpdateDto.getProductId()).get();
-            reviewCount = productMetrics.getReviewCount();
-            totalSales = productMetrics.getTotalSalesCount();
-            sellerId = productMetrics.getSellerId();
-          }
+          Product product =
+              productRepository
+                  .findById(productUpdateDto.getProductId())
+                  .orElseThrow(ProductNotFoundException::new);
 
           productMetricsRepository.save(
               ProductMetrics.builder()
-                  .productId(productUpdateDto.getProductId())
-                  .reviewCount(reviewCount)
-                  .sellerId(sellerId)
-                  .totalSalesCount(totalSales + productUpdateDto.getProductCount())
+                  .productMetricsId(
+                      ProductMetricsId.builder()
+                          .productId(productUpdateDto.getProductId())
+                          .createdAt(LocalDateTime.now().toString())
+                          .build())
+                  .action("ORDER")
+                  .sellerId(product.getSellerId())
+                  .reviewCount(0L)
+                  .totalSalesCount(productUpdateDto.getProductCount())
+                  .totalSalesPrice(product.getPrice() * productUpdateDto.getProductCount())
                   .build());
         });
   }
@@ -325,18 +330,24 @@ public class ProductService {
 
     productUpdateDtoList.forEach(
         productUpdateDto -> {
-          if (productMetricsRepository.existsById(productUpdateDto.getProductId())) {
-            ProductMetrics productMetrics =
-                productMetricsRepository.findById(productUpdateDto.getProductId()).get();
-            productMetricsRepository.save(
-                ProductMetrics.builder()
-                    .productId(productUpdateDto.getProductId())
-                    .sellerId(productMetrics.getSellerId())
-                    .reviewCount(productMetrics.getReviewCount())
-                    .totalSalesCount(
-                        productMetrics.getTotalSalesCount() - productUpdateDto.getProductCount())
-                    .build());
-          }
+          Product product =
+              productRepository
+                  .findById(productUpdateDto.getProductId())
+                  .orElseThrow(ProductNotFoundException::new);
+
+          productMetricsRepository.save(
+              ProductMetrics.builder()
+                  .productMetricsId(
+                      ProductMetricsId.builder()
+                          .productId(productUpdateDto.getProductId())
+                          .createdAt(LocalDateTime.now().toString())
+                          .build())
+                  .action("CANCEL_ORDER")
+                  .sellerId(product.getSellerId())
+                  .reviewCount(0L)
+                  .totalSalesCount(-productUpdateDto.getProductCount())
+                  .totalSalesPrice(-(product.getPrice() * productUpdateDto.getProductCount()))
+                  .build());
         });
   }
 
@@ -384,11 +395,6 @@ public class ProductService {
   }
 
   public void checkProductStock(List<ProductUpdateDto> productUpdateListDto) {
-    log.info(
-        "상품"
-            + productUpdateListDto.get(0).getProductId().toString()
-            + "----"
-            + productUpdateListDto.get(0).getProductCount().toString());
     for (ProductUpdateDto productUpdateDto : productUpdateListDto) {
 
       Product product = productRepository.findById(productUpdateDto.getProductId()).get();
