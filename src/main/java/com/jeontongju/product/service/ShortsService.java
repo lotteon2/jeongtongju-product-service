@@ -1,14 +1,24 @@
 package com.jeontongju.product.service;
 
+import com.jeontongju.product.domain.Product;
 import com.jeontongju.product.domain.Shorts;
 import com.jeontongju.product.dto.request.CreateShortsDto;
 import com.jeontongju.product.dto.request.UpdateShortsDto;
 import com.jeontongju.product.dto.response.GetShortsByConsumerDto;
 import com.jeontongju.product.dto.response.GetShortsBySellerDto;
 import com.jeontongju.product.dto.response.GetShortsDetailsDto;
+import com.jeontongju.product.dynamodb.domian.ProductRecord;
+import com.jeontongju.product.dynamodb.domian.ProductRecordContents;
+import com.jeontongju.product.dynamodb.domian.ProductRecordId;
+import com.jeontongju.product.dynamodb.repository.ProductMetricsRepository;
+import com.jeontongju.product.dynamodb.repository.ProductRecordRepository;
+import com.jeontongju.product.exception.ProductNotFoundException;
 import com.jeontongju.product.exception.ShortsNotFoundException;
 import com.jeontongju.product.mapper.ProductMapper;
+import com.jeontongju.product.repository.ProductRepository;
 import com.jeontongju.product.repository.ShortsRepository;
+
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +35,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ShortsService {
 
   private final ShortsRepository shortsRepository;
+  private final ProductRepository productRepository;
+  private final ProductRecordRepository productRecordRepository;
   private final ProductMapper productMapper;
 
   public Page<GetShortsByConsumerDto> getMainShorts(Pageable pageable) {
@@ -72,7 +84,24 @@ public class ShortsService {
 
   @Transactional
   public void createShorts(Long memberId, CreateShortsDto createShortsDto) {
-    shortsRepository.save(productMapper.toShortsEntity(memberId, createShortsDto));
+    Shorts shorts = shortsRepository.save(productMapper.toShortsEntity(memberId, createShortsDto));
+    String productId = createShortsDto.getProductId();
+    if (productId != null) {
+      Product product = productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
+      // 변경 이력 - dynamo db
+      ProductRecordContents updateProductRecord =
+              ProductRecordContents.toDto(createShortsDto.getProductId(), product, shorts.getShortsId());
+      productRecordRepository.save(
+              ProductRecord.builder()
+                      .productRecordId(
+                              ProductRecordId.builder()
+                                      .productId(product.getProductId())
+                                      .createdAt(LocalDateTime.now().toString())
+                                      .build())
+                      .productRecord(updateProductRecord)
+                      .action("UPDATE-SHORTS")
+                      .build());
+    }
   }
 
   @Transactional

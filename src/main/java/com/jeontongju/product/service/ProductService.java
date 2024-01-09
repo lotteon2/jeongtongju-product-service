@@ -90,13 +90,17 @@ public class ProductService {
 
     productMetricsRepository.save(
         ProductMetrics.builder()
-            .productId(savedProduct.getProductId())
+            .productMetricsId(
+                ProductMetricsId.builder()
+                    .productId(savedProduct.getProductId())
+                    .createdAt(LocalDateTime.now().toString())
+                    .build())
+            .sellerId(savedProduct.getSellerId())
+            .action("INSERT")
             .reviewCount(0L)
             .totalSalesCount(0L)
+            .totalSalesPrice(0L)
             .build());
-
-    // kafka - search
-    productProducer.sendCreateProductToSearch(createProductRecord);
 
     return savedProduct;
   }
@@ -115,7 +119,6 @@ public class ProductService {
         productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
     product.setDeleted(true);
     List<String> productIds = List.of(productId);
-    productProducer.sendDeleteProductToSearch(productIds);
     productProducer.sendDeleteProductToWish(productIds);
     productProducer.sendDeleteProductToReview(productIds);
   }
@@ -131,7 +134,6 @@ public class ProductService {
           product.setDeleted(true);
           productIds.add(product.getProductId());
         });
-    productProducer.sendDeleteProductToSearch(productIds);
     productProducer.sendDeleteProductToWish(productIds);
     productProducer.sendDeleteProductToReview(productIds);
   }
@@ -154,9 +156,6 @@ public class ProductService {
             .productRecord(updateProductRecord)
             .action("UPDATE")
             .build());
-
-    // kafka search
-    productProducer.sendUpdateProductToSearch(updateProductRecord);
   }
 
   @Transactional
@@ -180,9 +179,14 @@ public class ProductService {
             .action("UPDATE")
             .build());
 
-    // kafka review, search
-    productProducer.sendUpdateProductToSearch(updateProductRecord);
-    productProducer.sendUpdateProductToReview(modifyProductInfoDto.getProductThumbnailImageUrl());
+    // kafka review
+    if (modifyProductInfoDto.getProductThumbnailImageUrl() != null) {
+      productProducer.sendUpdateProductToReview(
+          ProductImageInfoDto.builder()
+              .productId(productId)
+              .productThumbnailImageUrl(modifyProductInfoDto.getProductThumbnailImageUrl())
+              .build());
+    }
   }
 
   @Transactional
@@ -251,6 +255,21 @@ public class ProductService {
       }
       // 재고 차감
       product.setStockQuantity(product.getStockQuantity() - productUpdateDto.getProductCount());
+
+      // 변경 이력 - dynamo db
+      ProductRecordContents updateProductRecord =
+          ProductRecordContents.toDto(product.getProductId(), product, null);
+
+      productRecordRepository.save(
+          ProductRecord.builder()
+              .productRecordId(
+                  ProductRecordId.builder()
+                      .productId(product.getProductId())
+                      .createdAt(LocalDateTime.now().toString())
+                      .build())
+              .productRecord(updateProductRecord)
+              .action("UPDATE")
+              .build());
     }
   }
 
@@ -263,49 +282,72 @@ public class ProductService {
               .orElseThrow(() -> new StockException("존재 하지 않는 상품"));
       // 재고 복구
       product.setStockQuantity(product.getStockQuantity() + productUpdateDto.getProductCount());
+
+      // 변경 이력 - dynamo db
+      ProductRecordContents updateProductRecord =
+          ProductRecordContents.toDto(product.getProductId(), product, null);
+
+      productRecordRepository.save(
+          ProductRecord.builder()
+              .productRecordId(
+                  ProductRecordId.builder()
+                      .productId(product.getProductId())
+                      .createdAt(LocalDateTime.now().toString())
+                      .build())
+              .productRecord(updateProductRecord)
+              .action("UPDATE")
+              .build());
     }
   }
 
   @Transactional
-  public void updateProductSalesCountFromOrder(List<ProductUpdateDto> productUpdateDtoList) {
+  public void addProductMetricsFromOrder(List<ProductUpdateDto> productUpdateDtoList) {
     productUpdateDtoList.forEach(
         productUpdateDto -> {
-          Long reviewCount = 0L;
-          Long totalSales = 0L;
-
-          ProductMetrics productMetrics =
-              productMetricsRepository.findById(productUpdateDto.getProductId()).get();
-
-          if (productMetrics != null) {
-            reviewCount = productMetrics.getReviewCount();
-            totalSales = productMetrics.getTotalSalesCount();
-          }
+          Product product =
+              productRepository
+                  .findById(productUpdateDto.getProductId())
+                  .orElseThrow(ProductNotFoundException::new);
 
           productMetricsRepository.save(
               ProductMetrics.builder()
-                  .productId(productUpdateDto.getProductId())
-                  .reviewCount(reviewCount)
-                  .totalSalesCount(totalSales + productUpdateDto.getProductCount())
+                  .productMetricsId(
+                      ProductMetricsId.builder()
+                          .productId(productUpdateDto.getProductId())
+                          .createdAt(LocalDateTime.now().toString())
+                          .build())
+                  .action("ORDER")
+                  .sellerId(product.getSellerId())
+                  .reviewCount(0L)
+                  .totalSalesCount(productUpdateDto.getProductCount())
+                  .totalSalesPrice(product.getPrice() * productUpdateDto.getProductCount())
                   .build());
         });
   }
 
   @Transactional
-  public void addStockFromCancelOrder(List<ProductUpdateDto> productUpdateDtoList) {
+  public void reduceProductMetricsFromCancelOrder(List<ProductUpdateDto> productUpdateDtoList) {
 
     productUpdateDtoList.forEach(
         productUpdateDto -> {
-          ProductMetrics productMetrics =
-              productMetricsRepository.findById(productUpdateDto.getProductId()).get();
-          if (productMetrics != null) {
-            productMetricsRepository.save(
-                ProductMetrics.builder()
-                    .productId(productUpdateDto.getProductId())
-                    .reviewCount(productMetrics.getReviewCount())
-                    .totalSalesCount(
-                        productMetrics.getTotalSalesCount() - productUpdateDto.getProductCount())
-                    .build());
-          }
+          Product product =
+              productRepository
+                  .findById(productUpdateDto.getProductId())
+                  .orElseThrow(ProductNotFoundException::new);
+
+          productMetricsRepository.save(
+              ProductMetrics.builder()
+                  .productMetricsId(
+                      ProductMetricsId.builder()
+                          .productId(productUpdateDto.getProductId())
+                          .createdAt(LocalDateTime.now().toString())
+                          .build())
+                  .action("CANCEL_ORDER")
+                  .sellerId(product.getSellerId())
+                  .reviewCount(0L)
+                  .totalSalesCount(-productUpdateDto.getProductCount())
+                  .totalSalesPrice(-(product.getPrice() * productUpdateDto.getProductCount()))
+                  .build());
         });
   }
 
@@ -335,17 +377,24 @@ public class ProductService {
     productIdList.getProductIdList().stream()
         .forEach(
             id -> {
-              log.info(productRepository.findById(id).orElseThrow(ProductNotFoundException::new).getStockQuantity().toString());
-              productStock.put(id, productRepository.findById(id).orElseThrow(ProductNotFoundException::new).getStockQuantity());
-            }
-            );
+              log.info(
+                  productRepository
+                      .findById(id)
+                      .orElseThrow(ProductNotFoundException::new)
+                      .getStockQuantity()
+                      .toString());
+              productStock.put(
+                  id,
+                  productRepository
+                      .findById(id)
+                      .orElseThrow(ProductNotFoundException::new)
+                      .getStockQuantity());
+            });
 
     return productStock;
-
   }
 
   public void checkProductStock(List<ProductUpdateDto> productUpdateListDto) {
-    log.info("상품" + productUpdateListDto.get(0).getProductId().toString() + "----" + productUpdateListDto.get(0).getProductCount().toString() );
     for (ProductUpdateDto productUpdateDto : productUpdateListDto) {
 
       Product product = productRepository.findById(productUpdateDto.getProductId()).get();
