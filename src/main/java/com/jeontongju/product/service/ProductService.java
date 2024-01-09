@@ -409,4 +409,16 @@ public class ProductService {
       }
     }
   }
+
+  public Long getStockUnderFive(Long sellerId) {
+    Long countProductUnderFive = 0L;
+    List<Product> productList = productRepository.findBySellerId(sellerId);
+
+    for (Product product : productList) {
+      if (product.getStockQuantity() < 5) {
+        countProductUnderFive += 1;
+      }
+    }
+    return countProductUnderFive;
+  }
 }

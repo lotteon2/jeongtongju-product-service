@@ -2,7 +2,6 @@ package com.jeontongju.product.controller;
 
 import com.jeontongju.product.service.ProductService;
 import io.github.bitbox.bitbox.dto.*;
-
 import java.util.HashMap;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -51,15 +50,23 @@ public class ProductClientController {
   }
 
   @PostMapping("/wish-cart/stock")
-  ResponseEntity<FeignFormat<HashMap<String,Long>>> getProductStock(
-          @RequestBody ProductIdListDto productIdList) {
-
-    log.info("장바구니" + productIdList.getProductIdList().get(0).toString());
+  ResponseEntity<FeignFormat<HashMap<String, Long>>> getProductStock(
+      @RequestBody ProductIdListDto productIdList) {
 
     return ResponseEntity.ok(
-            FeignFormat.<HashMap<String,Long>>builder()
-                    .code(HttpStatus.OK.value())
-                    .data(productService.getProductStockByCart(productIdList))
-                    .build());
+        FeignFormat.<HashMap<String, Long>>builder()
+            .code(HttpStatus.OK.value())
+            .data(productService.getProductStockByCart(productIdList))
+            .build());
+  }
+
+  @GetMapping("/seller/{sellerId}/product/stockUnderFive")
+  ResponseEntity<FeignFormat<Long>> getStockUnderFive(@PathVariable Long sellerId) {
+
+    return ResponseEntity.ok(
+        FeignFormat.<Long>builder()
+            .code(HttpStatus.OK.value())
+            .data(productService.getStockUnderFive(sellerId))
+            .build());
   }
 }
