@@ -351,13 +351,15 @@ public class ProductService {
         });
   }
 
-  public String getProductImage(String productId) {
+  public SellerProductInfoDto getProductSeller(String productId) {
 
-    return productRepository
-        .findById(productId)
-        .orElseThrow(ProductNotFoundException::new)
-        .getProductThumbnailImage()
-        .getImageUrl();
+    Product product =
+        productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
+
+    return SellerProductInfoDto.builder()
+        .sellerId(product.getSellerId())
+        .productImageUrl(product.getProductThumbnailImage().getImageUrl())
+        .build();
   }
 
   public List<ProductWishInfoDto> getProductInfoForWish(ProductIdListDto productIdList) {
@@ -408,5 +410,17 @@ public class ProductService {
                 .build());
       }
     }
+  }
+
+  public Long getStockUnderFive(Long sellerId) {
+    Long countProductUnderFive = 0L;
+    List<Product> productList = productRepository.findBySellerId(sellerId);
+
+    for (Product product : productList) {
+      if (product.getStockQuantity() < 5) {
+        countProductUnderFive += 1;
+      }
+    }
+    return countProductUnderFive;
   }
 }
