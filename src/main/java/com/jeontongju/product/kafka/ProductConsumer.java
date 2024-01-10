@@ -89,7 +89,7 @@ public class ProductConsumer {
   }
 
   public void sendOrderInfoDto(OrderInfoDto orderInfoDto) {
-    if (orderInfoDto.getUserCouponUpdateDto().getCouponCode() != null) {
+    if (orderInfoDto.getUserPointUpdateDto().getPoint() > 0) {
       // 쿠폰
       productProducer.rollbackCouponByCancel(orderInfoDto);
     } else if (orderInfoDto.getUserPointUpdateDto().getPoint() != null) {
