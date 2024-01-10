@@ -351,13 +351,15 @@ public class ProductService {
         });
   }
 
-  public String getProductImage(String productId) {
+  public SellerProductInfoDto getProductSeller(String productId) {
 
-    return productRepository
-        .findById(productId)
-        .orElseThrow(ProductNotFoundException::new)
-        .getProductThumbnailImage()
-        .getImageUrl();
+    Product product =
+        productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
+
+    return SellerProductInfoDto.builder()
+        .sellerId(product.getSellerId())
+        .productImageUrl(product.getProductThumbnailImage().getImageUrl())
+        .build();
   }
 
   public List<ProductWishInfoDto> getProductInfoForWish(ProductIdListDto productIdList) {

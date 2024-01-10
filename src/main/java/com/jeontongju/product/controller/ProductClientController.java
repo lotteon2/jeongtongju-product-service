@@ -29,12 +29,12 @@ public class ProductClientController {
   }
 
   @GetMapping("/products/{productId}/image")
-  ResponseEntity<FeignFormat<String>> getProductImage(@PathVariable String productId) {
+  ResponseEntity<FeignFormat<SellerProductInfoDto>> getProductSeller(@PathVariable String productId) {
 
     return ResponseEntity.ok(
-        FeignFormat.<String>builder()
+        FeignFormat.<SellerProductInfoDto>builder()
             .code(HttpStatus.OK.value())
-            .data(productService.getProductImage(productId))
+            .data(productService.getProductSeller(productId))
             .build());
   }
 
