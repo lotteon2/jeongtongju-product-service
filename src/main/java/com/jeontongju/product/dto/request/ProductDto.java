@@ -15,7 +15,6 @@ import lombok.*;
 @ToString
 public class ProductDto {
 
-  @Size(min = 1, max = 200, message = "내용은 1글자 이상 200 글자 이하만 입력 가능합니다.")
   @NotBlank(message = "null 이 불가합니다.")
   private String productName;
 
