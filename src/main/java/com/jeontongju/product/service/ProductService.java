@@ -121,6 +121,21 @@ public class ProductService {
     List<String> productIds = List.of(productId);
     productProducer.sendDeleteProductToWish(productIds);
     productProducer.sendDeleteProductToReview(productIds);
+
+    ProductRecordContents updateProductRecord =
+            ProductRecordContents.toDto(productId, product, null);
+
+    productRecordRepository.save(
+            ProductRecord.builder()
+                    .productRecordId(
+                            ProductRecordId.builder()
+                                    .productId(productId)
+                                    .createdAt(product.getUpdatedAt().toString())
+                                    .build())
+                    .productRecord(updateProductRecord)
+                    .action("UPDATE")
+                    .build());
+
   }
 
   @Transactional
@@ -133,7 +148,23 @@ public class ProductService {
         product -> {
           product.setDeleted(true);
           productIds.add(product.getProductId());
+
+          ProductRecordContents updateProductRecord =
+                  ProductRecordContents.toDto(product.getProductId(), product, null);
+
+          productRecordRepository.save(
+                  ProductRecord.builder()
+                          .productRecordId(
+                                  ProductRecordId.builder()
+                                          .productId(product.getProductId())
+                                          .createdAt(product.getUpdatedAt().toString())
+                                          .build())
+                          .productRecord(updateProductRecord)
+                          .action("UPDATE")
+                          .build());
+
         });
+
     productProducer.sendDeleteProductToWish(productIds);
     productProducer.sendDeleteProductToReview(productIds);
   }
