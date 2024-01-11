@@ -10,6 +10,7 @@ import io.github.bitbox.bitbox.dto.ResponseFormat;
 import io.github.bitbox.bitbox.enums.MemberRoleEnum;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class ShortsRestController {
 
   private final ShortsService shortsService;
@@ -127,6 +129,14 @@ public class ShortsRestController {
           @RequestHeader Long memberId,
           @RequestHeader MemberRoleEnum memberRole,
           @PathVariable Long shortsId) {
+
+    log.info("확인");
+    if (memberId != null) {
+      log.info("null 아님");
+      log.info(String.valueOf(memberId));
+      log.info(memberRole.toString());
+    }
+
 
     shortsService.deleteShorts(shortsId);
 
