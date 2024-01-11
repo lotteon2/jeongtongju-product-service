@@ -92,7 +92,7 @@ public class ProductConsumer {
     if (orderInfoDto.getUserCouponUpdateDto().getCouponCode() != null) {
       // 쿠폰
       productProducer.rollbackCouponByCancel(orderInfoDto);
-    } else if (orderInfoDto.getUserPointUpdateDto().getPoint() > 0) {
+    } else if (orderInfoDto.getUserPointUpdateDto().getPoint() > 0 ) {
       // 포인트
       productProducer.addPointByCancel(orderInfoDto);
     }
