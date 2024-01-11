@@ -73,7 +73,7 @@ public class ShortsService {
 
   public Page<GetShortsBySellerDto> getShortsBySeller(Long sellerId, Pageable pageable) {
 
-    Page<Shorts> shortsList = shortsRepository.findShortsBySellerId(sellerId, pageable);
+    Page<Shorts> shortsList = shortsRepository.findShortsBySellerIdAndIsDeleted(sellerId, pageable, false);
     return new PageImpl<GetShortsBySellerDto>(
         shortsList.getContent().stream()
             .map(shorts -> GetShortsBySellerDto.toDto(shorts))

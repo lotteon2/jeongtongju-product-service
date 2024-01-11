@@ -24,10 +24,10 @@ public class GetShortsByConsumerDto {
 
     public static GetShortsByConsumerDto toDto(Shorts shorts) {
         String targetId = "";
-        if (shorts.getType() != ShortsTypeEnum.PRODUCT
+        if (shorts.getProductId() != null
         ) {
             targetId = "product/" + shorts.getProductId();
-        } else if (shorts.getType() != ShortsTypeEnum.SELLER) {
+        } else {
             targetId = "seller/" + shorts.getSellerId();
         }
 
