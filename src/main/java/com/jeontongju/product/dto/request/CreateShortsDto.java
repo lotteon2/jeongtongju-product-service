@@ -1,5 +1,6 @@
 package com.jeontongju.product.dto.request;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import lombok.*;
@@ -16,10 +17,10 @@ public class CreateShortsDto {
   @NotNull(message = "null 이 불가합니다.")
   private String shortsDescription;
 
-  @NotNull(message = "null 이 불가합니다.")
+  @NotBlank(message = "null 이 불가합니다.")
   private String shortsPreviewUrl;
 
-  @NotNull(message = "null 이 불가합니다.")
+  @NotBlank(message = "null 이 불가합니다.")
   private String shortsVideoUrl;
 
   @NotNull(message = "null 이 불가합니다.")
