@@ -10,14 +10,12 @@ import com.jeontongju.product.dto.response.GetShortsDetailsDto;
 import com.jeontongju.product.dynamodb.domian.ProductRecord;
 import com.jeontongju.product.dynamodb.domian.ProductRecordContents;
 import com.jeontongju.product.dynamodb.domian.ProductRecordId;
-import com.jeontongju.product.dynamodb.repository.ProductMetricsRepository;
 import com.jeontongju.product.dynamodb.repository.ProductRecordRepository;
 import com.jeontongju.product.exception.ProductNotFoundException;
 import com.jeontongju.product.exception.ShortsNotFoundException;
 import com.jeontongju.product.mapper.ProductMapper;
 import com.jeontongju.product.repository.ProductRepository;
 import com.jeontongju.product.repository.ShortsRepository;
-
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -73,7 +71,8 @@ public class ShortsService {
 
   public Page<GetShortsBySellerDto> getShortsBySeller(Long sellerId, Pageable pageable) {
 
-    Page<Shorts> shortsList = shortsRepository.findShortsBySellerIdAndIsDeleted(sellerId, pageable, false);
+    Page<Shorts> shortsList =
+        shortsRepository.findShortsBySellerIdAndIsDeleted(sellerId, pageable, false);
     return new PageImpl<GetShortsBySellerDto>(
         shortsList.getContent().stream()
             .map(shorts -> GetShortsBySellerDto.toDto(shorts))
@@ -87,20 +86,22 @@ public class ShortsService {
     Shorts shorts = shortsRepository.save(productMapper.toShortsEntity(memberId, createShortsDto));
     String productId = createShortsDto.getProductId();
     if (productId != null) {
-      Product product = productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
+      Product product =
+          productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
       // 변경 이력 - dynamo db
       ProductRecordContents updateProductRecord =
-              ProductRecordContents.toDto(createShortsDto.getProductId(), product, shorts.getShortsId());
+          ProductRecordContents.toDto(
+              createShortsDto.getProductId(), product, shorts.getShortsId());
       productRecordRepository.save(
-              ProductRecord.builder()
-                      .productRecordId(
-                              ProductRecordId.builder()
-                                      .productId(product.getProductId())
-                                      .createdAt(LocalDateTime.now().toString())
-                                      .build())
-                      .productRecord(updateProductRecord)
-                      .action("UPDATE-SHORTS")
-                      .build());
+          ProductRecord.builder()
+              .productRecordId(
+                  ProductRecordId.builder()
+                      .productId(product.getProductId())
+                      .createdAt(LocalDateTime.now().toString())
+                      .build())
+              .productRecord(updateProductRecord)
+              .action("UPDATE-SHORTS")
+              .build());
     }
   }
 
@@ -115,6 +116,28 @@ public class ShortsService {
 
   @Transactional
   public void deleteShorts(Long shortsId) {
-    shortsRepository.findById(shortsId).orElseThrow(ShortsNotFoundException::new).setDeleted(true);
+    Shorts shorts = shortsRepository.findById(shortsId).orElseThrow(ShortsNotFoundException::new);
+    shorts.setDeleted(true);
+
+    // 변경 이력 - dynamo db
+    if (shorts.getProductId() != null) {
+      Product product =
+          productRepository
+              .findById(shorts.getProductId())
+              .orElseThrow(ProductNotFoundException::new);
+      // 변경 이력 - dynamo db
+      ProductRecordContents updateProductRecord =
+          ProductRecordContents.toDto(shorts.getProductId(), product, null);
+      productRecordRepository.save(
+          ProductRecord.builder()
+              .productRecordId(
+                  ProductRecordId.builder()
+                      .productId(product.getProductId())
+                      .createdAt(LocalDateTime.now().toString())
+                      .build())
+              .productRecord(updateProductRecord)
+              .action("UPDATE-SHORTS")
+              .build());
+    }
   }
 }
