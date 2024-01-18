@@ -15,7 +15,7 @@ public enum ConceptTypeEnum {
   GIFT("\uD83C\uDF81 선물"),
   MEETING_THE_FAMILY ("👨‍👩‍👧‍👧상견례"),
   HOLIDAY("🎎명절"),
-  ROOPTOP("\uD83C\uDF8E 루프탑"),
+  ROOPTOP("\uD83C\uDF15 루프탑"),
   HEALING("\uD83C\uDFE5 힐링"),
   EMOTION ("❤️감성"),
   HANGOVER_REMEDY("\uD83E\uDD2E 숙취퇴치");
