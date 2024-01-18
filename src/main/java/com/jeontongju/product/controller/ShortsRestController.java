@@ -29,7 +29,7 @@ public class ShortsRestController {
 
   @GetMapping("/shorts")
   public ResponseEntity<ResponseFormat<Page<GetShortsByConsumerDto>>> getMainShorts(
-      @PageableDefault(page = 0, sort = "shortsHits", direction = Sort.Direction.DESC, size = 6)
+      @PageableDefault(page = 0, sort = "createdAt", direction = Sort.Direction.DESC, size = 6)
           Pageable pageable) {
 
     return ResponseEntity.ok()
@@ -45,7 +45,7 @@ public class ShortsRestController {
   @GetMapping("/sellers/{sellerId}/shorts")
   public ResponseEntity<ResponseFormat<Page<GetShortsByConsumerDto>>> getOneSellerShorts(
       @PathVariable Long sellerId,
-      @PageableDefault(page = 0, sort = "shortsHits", direction = Sort.Direction.DESC, size = 5)
+      @PageableDefault(page = 0, sort = "createdAt", direction = Sort.Direction.DESC, size = 5)
           Pageable pageable) {
 
     return ResponseEntity.ok()
@@ -129,14 +129,6 @@ public class ShortsRestController {
           @RequestHeader Long memberId,
           @RequestHeader MemberRoleEnum memberRole,
           @PathVariable Long shortsId) {
-
-    log.info("확인");
-    if (memberId != null) {
-      log.info("null 아님");
-      log.info(String.valueOf(memberId));
-      log.info(memberRole.toString());
-    }
-
 
     shortsService.deleteShorts(shortsId);
 
